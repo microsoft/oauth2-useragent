@@ -18,4 +18,8 @@ public class UserAgentImpl implements UserAgent {
         return null;
     }
 
+    static String extractResponseFromRedirectUri(final String redirectedUri) {
+        final URI uri = URI.create(redirectedUri);
+        return uri.getQuery();
+    }
 }
