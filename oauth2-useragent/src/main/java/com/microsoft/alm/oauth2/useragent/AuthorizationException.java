@@ -3,9 +3,17 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 public class AuthorizationException extends Exception {
+
+    static final String ERROR_CODE = "error";
+    static final String ERROR_DESCRIPTION = "error_description";
+    static final String ERROR_URI = "error_uri";
+
+    private static final String UTF_8 = "UTF-8";
 
     private final String code;
     private final String description;
@@ -32,5 +40,28 @@ public class AuthorizationException extends Exception {
 
     public URI getUri() {
         return uri;
+    }
+
+    @Override public String toString() {
+        return toString(this.code, this.description, this.uri);
+    }
+
+    public static String toString(final String code, final String description, final URI uri) {
+        try {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(ERROR_CODE).append('=').append(URLEncoder.encode(code, UTF_8));
+            if (description != null) {
+                sb.append('&');
+                sb.append(ERROR_DESCRIPTION).append('=').append(URLEncoder.encode(description, UTF_8));
+            }
+            if (uri != null) {
+                sb.append('&');
+                sb.append(ERROR_URI).append('=').append(URLEncoder.encode(uri.toString(), UTF_8));
+            }
+            return sb.toString();
+        }
+        catch (final UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
     }
 }

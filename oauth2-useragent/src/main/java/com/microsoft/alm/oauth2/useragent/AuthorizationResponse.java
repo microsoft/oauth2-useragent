@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 public class AuthorizationResponse {
 
+    static final String RESPONSE_CODE = "code";
+    static final String RESPONSE_STATE = "state";
 
     private static final String UTF_8 = "UTF-8";
     private static final Pattern PAIR_SEPARATOR = Pattern.compile("&");
@@ -35,15 +37,15 @@ public class AuthorizationResponse {
     @Override public String toString() {
         try {
             final StringBuilder sb = new StringBuilder();
-            sb.append("code=").append(URLEncoder.encode(code, UTF_8));
+            sb.append(RESPONSE_CODE).append('=').append(URLEncoder.encode(code, UTF_8));
             if (state != null) {
                 sb.append('&');
-                sb.append("state=").append(URLEncoder.encode(state, UTF_8));
+                sb.append(RESPONSE_STATE).append('=').append(URLEncoder.encode(state, UTF_8));
             }
             return sb.toString();
         }
-        catch (final UnsupportedEncodingException ignored) {
-            return null;
+        catch (final UnsupportedEncodingException e) {
+            throw new Error(e);
         }
     }
 
@@ -61,19 +63,20 @@ public class AuthorizationResponse {
                 try {
                     final String name = URLDecoder.decode(nameAndValue[0], UTF_8);
                     final String value = URLDecoder.decode(nameAndValue[1], UTF_8);
-                    if ("code".equals(name)) {
+                    if (RESPONSE_CODE.equals(name)) {
                         code = value;
-                    } else if ("state".equals(name)) {
+                    } else if (RESPONSE_STATE.equals(name)) {
                         state = value;
-                    } else if ("error".equals(name)) {
+                    } else if (AuthorizationException.ERROR_CODE.equals(name)) {
                         error = value;
-                    } else if ("error_description".equals(name)) {
+                    } else if (AuthorizationException.ERROR_DESCRIPTION.equals(name)) {
                         errorDescription = value;
-                    } else if ("error_uri".equals(name)) {
+                    } else if (AuthorizationException.ERROR_URI.equals(name)) {
                         errorUriString = value;
                     }
                 }
-                catch (final UnsupportedEncodingException ignored) {
+                catch (final UnsupportedEncodingException e) {
+                    throw new Error(e);
                 }
             }
         }
