@@ -5,10 +5,12 @@ package com.microsoft.alm.oauth2.useragent;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -45,8 +47,27 @@ public class UserAgentImplTest {
 
         UserAgentImpl.decode(mockUserAgent, new String[]{UserAgentImpl.REQUEST_AUTHORIZATION_CODE}, inputStream, outputStream);
 
-        Mockito.verify(mockUserAgent);
+        Mockito.verify(mockUserAgent).requestAuthorizationCode(Matchers.isA(URI.class), Matchers.isA(URI.class));
         final String actual = outputStream.toString(UTF_8.name());
         Assert.assertEquals("code=red", actual.trim());
+    }
+
+    @Test public void encode_requestAuthorizationCode() throws AuthorizationException, IOException {
+        final String authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/authorize?resource=foo&client_id=bar&response_type=code&redirect_uri=https%3A//redirect.example.com";
+        final String redirectUri = "https://redirect.example.com";
+        final TestProcess process = new TestProcess("code=red");
+        final TestableProcessFactory processFactory = new TestableProcessFactory() {
+            @Override public TestableProcess create(final String... args) throws IOException {
+                return process;
+            }
+        };
+        final UserAgentImpl cut = new UserAgentImpl(processFactory);
+
+        final AuthorizationResponse actual = cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
+
+        Assert.assertEquals("red", actual.getCode());
+        final String actualStdout = process.getOutput();
+        Assert.assertEquals(authorizationEndpoint + NEW_LINE + redirectUri + NEW_LINE, actualStdout);
+
     }
 }
