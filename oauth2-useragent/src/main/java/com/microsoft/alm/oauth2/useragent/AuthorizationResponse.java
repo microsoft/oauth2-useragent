@@ -56,7 +56,7 @@ public class AuthorizationResponse {
         String errorDescription = null;
         String errorUriString = null;
         if (s != null) {
-            final String[] pairs = PAIR_SEPARATOR.split(s);
+            final String[] pairs = PAIR_SEPARATOR.split(s.trim());
 
             for (final String pair : pairs) {
                 final String[] nameAndValue = NAME_VALUE_SEPARATOR.split(pair, 2);

@@ -33,6 +33,15 @@ public class AuthorizationResponseTest {
         Assert.assertEquals("green", actual.getState());
     }
 
+    @Test public void fromString_authorizationResponseWithNewLine() throws Exception {
+        final String input = "code=red&state=green\r\n";
+
+        final AuthorizationResponse actual = AuthorizationResponse.fromString(input);
+
+        Assert.assertEquals("red", actual.getCode());
+        Assert.assertEquals("green", actual.getState());
+    }
+
     @Test public void fromString_errorResponse() throws Exception {
         final String input = "error=invalid_request&error_description=Insufficient%20vespene%20gas&error_uri=https%3A%2F%2Fen.wikipedia.org%2Fw%2Findex.php%3Ftitle%3DVespene_gas";
 
