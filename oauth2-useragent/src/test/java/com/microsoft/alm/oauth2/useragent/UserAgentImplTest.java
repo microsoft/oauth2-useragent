@@ -5,8 +5,18 @@ package com.microsoft.alm.oauth2.useragent;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.charset.Charset;
 
 public class UserAgentImplTest {
+
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
     @Test public void extractResponseFromRedirectUri_Typical() {
         final String redirectedUri = "https://msopentech.com/" +
@@ -21,4 +31,22 @@ public class UserAgentImplTest {
         Assert.assertEquals(expected, actual);
     }
 
+    @Test public void decode_requestAuthorizationCode() throws AuthorizationException, UnsupportedEncodingException {
+        final String authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/authorize?resource=foo&client_id=bar&response_type=code&redirect_uri=https%3A//redirect.example.com";
+        final String redirectUri = "https://redirect.example.com";
+        final UserAgent mockUserAgent = Mockito.mock(UserAgent.class);
+        Mockito.when(mockUserAgent.requestAuthorizationCode(URI.create(authorizationEndpoint), URI.create(redirectUri))).thenReturn(new AuthorizationResponse("red", null));
+        final StringBuilder sb = new StringBuilder();
+        sb.append(authorizationEndpoint).append(NEW_LINE);
+        sb.append(redirectUri).append(NEW_LINE);
+        final String stdout = sb.toString();
+        final ByteArrayInputStream inputStream = new ByteArrayInputStream(stdout.getBytes(UTF_8));
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        UserAgentImpl.decode(mockUserAgent, new String[]{UserAgentImpl.REQUEST_AUTHORIZATION_CODE}, inputStream, outputStream);
+
+        Mockito.verify(mockUserAgent);
+        final String actual = outputStream.toString(UTF_8.name());
+        Assert.assertEquals("code=red", actual.trim());
+    }
 }
