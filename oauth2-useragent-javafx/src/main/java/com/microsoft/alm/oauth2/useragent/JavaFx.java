@@ -14,14 +14,13 @@ public class JavaFx extends Application implements UserAgent, Runnable {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    private final InterceptingBrowser interceptingBrowser;
+    private InterceptingBrowser interceptingBrowser = null;
 
     public static void main(final String[] args) {
         launch(args);
     }
 
     public JavaFx() {
-        interceptingBrowser = new InterceptingBrowser();
     }
 
     @Override
@@ -45,6 +44,7 @@ public class JavaFx extends Application implements UserAgent, Runnable {
     public void start(final Stage primaryStage) throws Exception {
         // TODO: it would be nice if we could prepend the title with a user-supplied string
         primaryStage.setTitle("OAuth2 Authorization Request");
+        interceptingBrowser = new InterceptingBrowser();
         final Scene scene = new Scene(interceptingBrowser);
         primaryStage.setScene(scene);
         primaryStage.show();
