@@ -37,6 +37,11 @@
     <dependencies>
       <dependency>
         <groupId>com.microsoft.alm</groupId>
+        <artifactId>oauth2-useragent</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.alm</groupId>
         <artifactId>oauth2-useragent-core</artifactId>
         <version>${project.version}</version>
       </dependency>

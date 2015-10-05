@@ -55,7 +55,7 @@
   <dependencies>
     <dependency>
       <groupId>com.microsoft.alm</groupId>
-      <artifactId>oauth2-useragent-core</artifactId>
+      <artifactId>oauth2-useragent</artifactId>
     </dependency>
 
     <dependency>
