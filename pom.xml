@@ -40,6 +40,11 @@
         <artifactId>oauth2-useragent-core</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.microsoft.alm</groupId>
+        <artifactId>oauth2-useragent-javafx</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>junit</groupId>

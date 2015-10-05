@@ -66,5 +66,9 @@
       <groupId>com.microsoft.alm</groupId>
       <artifactId>oauth2-useragent-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.microsoft.alm</groupId>
+      <artifactId>oauth2-useragent-javafx</artifactId>
+    </dependency>
   </dependencies>
 </project>
