@@ -27,9 +27,10 @@
   </properties>
 
   <modules>
-    <module>oauth2-useragent</module>
     <module>oauth2-useragent-core</module>
     <module>oauth2-useragent-javafx</module>
+    <!-- The following module MUST go after core and the providers -->
+    <module>oauth2-useragent</module>
     <module>oauth2-useragent-tester</module>
   </modules>
 
