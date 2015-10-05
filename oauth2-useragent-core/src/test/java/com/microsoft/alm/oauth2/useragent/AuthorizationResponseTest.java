@@ -24,6 +24,19 @@ public class AuthorizationResponseTest {
         Assert.assertEquals("code=red", actual);
     }
 
+    @Test public void fromString_null() throws Exception {
+        final String input = null;
+
+        try {
+            AuthorizationResponse.fromString(input);
+        } catch (final AuthorizationException actual) {
+            Assert.assertEquals("error=unknown_error", actual.toString());
+            return;
+        }
+
+        Assert.fail("Exception should have been thrown by fromString()");
+    }
+
     @Test public void fromString_authorizationResponse() throws Exception {
         final String input = "code=red&state=green";
 

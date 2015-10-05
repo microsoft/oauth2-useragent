@@ -52,7 +52,7 @@ public class AuthorizationResponse {
     public static AuthorizationResponse fromString(final String s) throws AuthorizationException {
         String code = null;
         String state = null;
-        String error = null;
+        String error = "unknown_error";
         String errorDescription = null;
         String errorUriString = null;
         if (s != null) {
