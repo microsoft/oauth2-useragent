@@ -12,10 +12,10 @@
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>oauth2-useragent</artifactId>
+  <artifactId>oauth2-useragent-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>Microsoft OAuth2 User Agent library for Java</name>
+  <name>SDK for Microsoft OAuth2 User Agent library for Java</name>
 
   <build>
     <plugins>
