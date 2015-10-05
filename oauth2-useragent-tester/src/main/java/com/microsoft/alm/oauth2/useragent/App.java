@@ -11,6 +11,9 @@ import java.net.URISyntaxException;
  */
 public class App 
 {
+    static String code = null;
+    static String state;
+
     public static void main(final String[] args) throws AuthorizationException, URISyntaxException {
 
         final URI authorizationEndpoint = new URI(args[0]);
@@ -20,7 +23,9 @@ public class App
 
         final AuthorizationResponse authorizationResponse = userAgent.requestAuthorizationCode(authorizationEndpoint, redirectUri);
 
+        code = authorizationResponse.getCode();
+        state = authorizationResponse.getState();
         System.out.print("Authorization Code: ");
-        System.out.println(authorizationResponse.getCode());
+        System.out.println(code);
     }
 }
