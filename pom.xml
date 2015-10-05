@@ -22,6 +22,15 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <name>Oli Dagenais</name>
+      <email>olivida@microsoft.com</email>
+      <organization>Microsoft</organization>
+      <organizationUrl>http://www.microsoft.com/</organizationUrl>
+    </developer>
+  </developers>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
