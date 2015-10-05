@@ -114,7 +114,7 @@ public class UserAgentImpl implements UserAgent {
         if (JAVA_VERSION_STRING.startsWith("1.7.0") || JAVA_VERSION_STRING.startsWith("1.8.0")) {
             // TODO: JavaFX only started shipping with 1.7.0 Update 6
             classPath.add(new File(JAVA_HOME, "/lib/jfxrt.jar").getAbsolutePath());
-            return "JavaFX";
+            return "JavaFx";
         }
         // TODO: SWT needs the appropriate distribution
         // TODO: SWT on Mac needs to add "-XstartOnFirstThread" to command
