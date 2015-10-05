@@ -27,6 +27,7 @@
   </properties>
 
   <modules>
+    <module>oauth2-useragent</module>
     <module>oauth2-useragent-core</module>
     <module>oauth2-useragent-javafx</module>
     <module>oauth2-useragent-tester</module>
