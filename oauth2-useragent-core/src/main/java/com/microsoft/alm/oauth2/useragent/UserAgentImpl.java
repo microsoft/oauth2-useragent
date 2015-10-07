@@ -46,11 +46,11 @@ public class UserAgentImpl implements UserAgent {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
-        final String browser = determineBrowser(command, classPath);
+        final Provider provider = determineProvider(command, classPath);
         // TODO: is this the best way to add our JAR?
         classPath.add(System.getProperty("java.class.path"));
         addClassPathToCommand(classPath, command, PATH_SEPARATOR);
-        command.add("com.microsoft.alm.oauth2.useragent." + browser);
+        command.add("com.microsoft.alm.oauth2.useragent." + provider.getClassName());
         command.add(methodName);
         //noinspection ToArrayCallWithZeroLengthArrayArgument
         final String[] args = command.toArray(EMPTY_STRING_ARRAY);
@@ -109,12 +109,13 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
-    static String determineBrowser(final List<String> command, final List<String> classPath) {
+    static Provider determineProvider(final List<String> command, final List<String> classPath) {
+
         // TODO: parse into Version-like object so we can do proper greater-than checks
         if (JAVA_VERSION_STRING.startsWith("1.7.0") || JAVA_VERSION_STRING.startsWith("1.8.0")) {
             // TODO: JavaFX only started shipping with 1.7.0 Update 6
             classPath.add(new File(JAVA_HOME, "/lib/jfxrt.jar").getAbsolutePath());
-            return "JavaFx";
+            return Provider.JAVA_FX;
         }
         // TODO: SWT needs the appropriate distribution
         // TODO: SWT on Mac needs to add "-XstartOnFirstThread" to command
