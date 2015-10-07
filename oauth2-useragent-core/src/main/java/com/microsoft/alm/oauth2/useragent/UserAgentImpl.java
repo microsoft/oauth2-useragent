@@ -109,7 +109,7 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
-    String determineBrowser(final List<String> command, final List<String> classPath) {
+    static String determineBrowser(final List<String> command, final List<String> classPath) {
         // TODO: parse into Version-like object so we can do proper greater-than checks
         if (JAVA_VERSION_STRING.startsWith("1.7.0") || JAVA_VERSION_STRING.startsWith("1.8.0")) {
             // TODO: JavaFX only started shipping with 1.7.0 Update 6
