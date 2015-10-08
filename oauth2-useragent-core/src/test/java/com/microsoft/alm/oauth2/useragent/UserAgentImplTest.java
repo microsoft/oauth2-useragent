@@ -61,7 +61,7 @@ public class UserAgentImplTest {
                 return process;
             }
         };
-        final UserAgentImpl cut = new UserAgentImpl(processFactory);
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
 
         final AuthorizationResponse actual = cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
 

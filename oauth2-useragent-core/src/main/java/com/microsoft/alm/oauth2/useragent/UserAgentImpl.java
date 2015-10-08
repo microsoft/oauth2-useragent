@@ -25,13 +25,15 @@ public class UserAgentImpl implements UserAgent {
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final TestableProcessFactory processFactory;
+    private final Provider provider;
 
     public UserAgentImpl() {
-        this(new DefaultProcessFactory());
+        this(new DefaultProcessFactory(), determineProvider(System.getProperty("userAgentProvider")));
     }
 
-    UserAgentImpl(final TestableProcessFactory processFactory) {
+    UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider) {
         this.processFactory = processFactory;
+        this.provider = provider;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class UserAgentImpl implements UserAgent {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
-        final Provider provider = determineProvider(command, classPath);
+        provider.augmentProcessParameters(command, classPath);
         // TODO: is this the best way to add our JAR?
         classPath.add(System.getProperty("java.class.path"));
         addClassPathToCommand(classPath, command, PATH_SEPARATOR);
@@ -109,17 +111,21 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
-    static Provider determineProvider(final List<String> command, final List<String> classPath) {
+    static Provider determineProvider(final String userAgentProvider) {
 
-        // TODO: parse into Version-like object so we can do proper greater-than checks
-        if (JAVA_VERSION_STRING.startsWith("1.7.0") || JAVA_VERSION_STRING.startsWith("1.8.0")) {
-            // TODO: JavaFX only started shipping with 1.7.0 Update 6
-            classPath.add(new File(JAVA_HOME, "/lib/jfxrt.jar").getAbsolutePath());
-            return Provider.JAVA_FX;
+        if (userAgentProvider != null) {
+            for (final Provider provider : Provider.PROVIDERS) {
+                if (provider.getClassName().equals(userAgentProvider)) {
+                    return provider;
+                }
+            }
         }
-        // TODO: SWT needs the appropriate distribution
-        // TODO: SWT on Mac needs to add "-XstartOnFirstThread" to command
-        // TODO: SWT on RHEL 5 needs to download xulrunner, point to it and only on 32-bit VM
+        for (final Provider provider : Provider.PROVIDERS) {
+            final List<String> requirements = provider.checkRequirements();
+            if (requirements.size() == 0) {
+                return provider;
+            }
+        }
         throw new IllegalStateException("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
     }
 
