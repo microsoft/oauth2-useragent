@@ -3,6 +3,8 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Provider {
@@ -13,7 +15,11 @@ public abstract class Provider {
     static final String OS_NAME = System.getProperty("os.name");
     static final String ENV_DISPLAY = System.getenv("DISPLAY");
 
-    public static Provider JAVA_FX = new JavaFxProvider();
+    public static final Provider JAVA_FX = new JavaFxProvider();
+
+    public static final List<Provider> PROVIDERS = Collections.unmodifiableList(Arrays.asList(
+            JAVA_FX
+    ));
 
     private final String className;
 
