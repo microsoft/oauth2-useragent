@@ -16,16 +16,16 @@ class JavaFxProvider extends Provider {
         "JavaFX or OpenJFX runtime JAR.",
         "A desktop environment."
     ));
+    private final File[] potentialJavaFxJarLocations = new File[]{
+        new File(JAVA_HOME, "/lib/jfxrt.jar"),
+        new File(JAVA_HOME, "/lib/ext/jfxrt.jar"),
+    };
 
     protected JavaFxProvider() {
         super("JavaFx");
     }
 
     @Override public List<String> checkRequirements() {
-        final File[] potentialJavaFxJarLocations = {
-            new File(JAVA_HOME, "/lib/jfxrt.jar"),
-            new File(JAVA_HOME, "/lib/ext/jfxrt.jar"),
-        };
 
         return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, ENV_DISPLAY);
     }
