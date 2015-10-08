@@ -21,6 +21,7 @@ public class UserAgentImpl implements UserAgent {
     static final String JAVA_VERSION_STRING = System.getProperty("java.version");
     static final String JAVA_HOME = System.getProperty("java.home");
     static final String PATH_SEPARATOR = System.getProperty("path.separator");
+    static final String NEW_LINE = System.getProperty("line.separator");
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -111,6 +112,7 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
+    // TODO: this method could be more testable if it accepted a list of providers as a parameter
     static Provider determineProvider(final String userAgentProvider) {
 
         if (userAgentProvider != null) {
@@ -120,13 +122,19 @@ public class UserAgentImpl implements UserAgent {
                 }
             }
         }
+        final StringBuilder sb = new StringBuilder("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
         for (final Provider provider : Provider.PROVIDERS) {
             final List<String> requirements = provider.checkRequirements();
             if (requirements.size() == 0) {
                 return provider;
             }
+            sb.append(NEW_LINE);
+            sb.append("Unmet requirements for the '").append(provider.getClassName()).append("' provider:").append(NEW_LINE);
+            for (final String requirement : requirements) {
+                sb.append(" - ").append(requirement).append(NEW_LINE);
+            }
         }
-        throw new IllegalStateException("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+        throw new IllegalStateException(sb.toString());
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {
