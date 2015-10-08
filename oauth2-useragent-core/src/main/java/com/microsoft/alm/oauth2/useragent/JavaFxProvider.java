@@ -82,6 +82,15 @@ class JavaFxProvider extends Provider {
     }
 
     @Override public void augmentProcessParameters(final List<String> command, final List<String> classPath) {
-        // TODO: implement
+        File javaFxJar = null;
+        for (final File potentialJavaFxJar : potentialJavaFxJarLocations) {
+            if (potentialJavaFxJar.isFile()) {
+                javaFxJar = potentialJavaFxJar;
+                break;
+            }
+        }
+        if (javaFxJar != null) {
+            classPath.add(javaFxJar.getAbsolutePath());
+        }
     }
 }
