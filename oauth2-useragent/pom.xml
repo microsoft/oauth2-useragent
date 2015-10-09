@@ -22,8 +22,10 @@
       <resource>
         <directory>${project.basedir}/..</directory>
         <targetPath>./</targetPath>
+        <filtering>true</filtering>
         <includes>
           <include>License.txt</include>
+          <include>ReadMe.html</include>
         </includes>
       </resource>
       <!-- The following are implicit dependencies bundled in our JAR,
