@@ -48,7 +48,12 @@ public class AppTest {
                         .withBody("Access granted, although you shouldn't see this message!")));
         final String[] args = {authorizationEndpoint.toString(), redirectUri.toString()};
 
-        App.main(args);
+        try {
+            App.main(args);
+        }
+        catch (final AuthorizationException e) {
+            Assert.fail(e.getMessage() + UserAgentImpl.NEW_LINE + e.getDescription());
+        }
 
         Assert.assertEquals("steak", App.code);
         Assert.assertEquals("chicken", App.state);
