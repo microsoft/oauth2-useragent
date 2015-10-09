@@ -16,10 +16,12 @@ import javafx.stage.Stage;
 import java.net.URI;
 import java.util.List;
 
-public class JavaFx extends Application implements UserAgent, Runnable {
+public class JavaFx extends Application implements UserAgent, Runnable, RunnableFactory {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    static RunnableFactory RUNNABLE_FACTORY_OVERRIDE = null;
 
+    private final RunnableFactory runnableFactory;
     private InterceptingBrowser interceptingBrowser = null;
 
     public static void main(final String[] args) {
@@ -27,6 +29,7 @@ public class JavaFx extends Application implements UserAgent, Runnable {
     }
 
     public JavaFx() {
+        this.runnableFactory = RUNNABLE_FACTORY_OVERRIDE != null ? RUNNABLE_FACTORY_OVERRIDE : this;
     }
 
     @Override
@@ -71,7 +74,8 @@ public class JavaFx extends Application implements UserAgent, Runnable {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        final Thread thread = new Thread(this);
+        final Runnable runnable = runnableFactory.create(this);
+        final Thread thread = new Thread(runnable);
         thread.start();
     }
 
@@ -88,5 +92,10 @@ public class JavaFx extends Application implements UserAgent, Runnable {
         final String[] args = parameterList.toArray(EMPTY_STRING_ARRAY);
         UserAgentImpl.decode(this, args, System.in, System.out);
         System.exit(0);
+    }
+
+    @Override
+    public Runnable create(final JavaFx javaFx) {
+        return this;
     }
 }
