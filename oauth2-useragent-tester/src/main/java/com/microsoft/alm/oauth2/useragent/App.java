@@ -19,7 +19,7 @@ public class App
         final URI authorizationEndpoint = new URI(args[0]);
         final URI redirectUri = new URI(args[1]);
 
-        final UserAgentImpl userAgent = new UserAgentImpl();
+        final UserAgent userAgent = new UserAgentImpl();
 
         final AuthorizationResponse authorizationResponse = userAgent.requestAuthorizationCode(authorizationEndpoint, redirectUri);
 
