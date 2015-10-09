@@ -4,7 +4,13 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
 import javafx.stage.Stage;
 
 import java.net.URI;
@@ -44,8 +50,24 @@ public class JavaFx extends Application implements UserAgent, Runnable {
     public void start(final Stage primaryStage) throws Exception {
         // TODO: it would be nice if we could prepend the title with a user-supplied string
         primaryStage.setTitle("OAuth2 Authorization Request");
+
+        // TODO: consider adding a way to inspect the connection security/certificate
+        final TextField addressBar = new TextField();
+        addressBar.setEditable(false);
+
         interceptingBrowser = new InterceptingBrowser();
-        final Scene scene = new Scene(interceptingBrowser);
+        final WebEngine webEngine = interceptingBrowser.getWebEngine();
+        webEngine.locationProperty().addListener(new ChangeListener<String>() {
+            public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+                addressBar.setText(newValue);
+            }
+        });
+
+        final VBox vBox = new VBox(5);
+        vBox.getChildren().setAll(addressBar, interceptingBrowser);
+        VBox.setVgrow(interceptingBrowser, Priority.ALWAYS);
+
+        final Scene scene = new Scene(vBox);
         primaryStage.setScene(scene);
         primaryStage.show();
 

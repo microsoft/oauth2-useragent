@@ -31,6 +31,10 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
         getChildren().add(webView);
     }
 
+    public WebEngine getWebEngine() {
+        return webEngine;
+    }
+
     @Override
     public String toString() {
         return "destinationUri: " + destinationUriString + " redirectUri: " + redirectUriString;
