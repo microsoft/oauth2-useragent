@@ -13,12 +13,23 @@ import java.nio.charset.Charset;
 public class TestProcess implements TestableProcess {
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
+    private final ByteArrayInputStream errorStream;
     private final ByteArrayInputStream inputStream;
     private final ByteArrayOutputStream outputStream;
 
     public TestProcess(final String input) {
+        this(input, "");
+    }
+
+    public TestProcess(final String input, final String error) {
         inputStream = new ByteArrayInputStream(input.getBytes(UTF_8));
+        errorStream = new ByteArrayInputStream(error.getBytes(UTF_8));
         outputStream = new ByteArrayOutputStream();
+    }
+
+    @Override
+    public InputStream getErrorStream() {
+        return errorStream;
     }
 
     @Override

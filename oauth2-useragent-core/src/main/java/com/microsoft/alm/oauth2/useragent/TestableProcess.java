@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 interface TestableProcess {
+    InputStream getErrorStream();
     InputStream getInputStream();
     OutputStream getOutputStream();
     int waitFor() throws InterruptedException;

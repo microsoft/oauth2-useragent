@@ -15,6 +15,11 @@ class DefaultProcess implements TestableProcess {
     }
 
     @Override
+    public InputStream getErrorStream() {
+        return process.getErrorStream();
+    }
+
+    @Override
     public InputStream getInputStream() {
         return process.getInputStream();
     }
