@@ -43,6 +43,46 @@ public class UserAgentImpl implements UserAgent {
         return encode(REQUEST_AUTHORIZATION_CODE, authorizationEndpoint.toString(), redirectUri.toString());
     }
 
+    class StreamConsumer implements Runnable {
+
+        private final InputStream source;
+        private final StringBuilder contents;
+
+        public StreamConsumer(final InputStream source) {
+            if (source == null)
+                throw new IllegalArgumentException("The 'source' argument is null.");
+
+            this.source = source;
+            this.contents = new StringBuilder();
+        }
+
+        @Override
+        public String toString() {
+            return contents.toString();
+        }
+
+        @Override
+        public void run() {
+            try {
+                final InputStreamReader inputStreamReader = new InputStreamReader(source);
+                final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    contents.append(line).append(NEW_LINE);
+                }
+            }
+            catch (final IOException ignored) {
+            }
+            finally {
+                try {
+                    source.close();
+                }
+                catch (final IOException ignored) {
+                }
+            }
+        }
+    }
+
     AuthorizationResponse encode(final String methodName, final String... parameters)
             throws AuthorizationException {
         final ArrayList<String> command = new ArrayList<String>();
@@ -66,13 +106,23 @@ public class UserAgentImpl implements UserAgent {
             }
             printStream.flush();
 
-            final InputStream inputStream = process.getInputStream();
-            final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            final String response = bufferedReader.readLine();
+            final StreamConsumer stdOut = new StreamConsumer(process.getInputStream());
+            final Thread stdOutThread = new Thread(stdOut);
+            final StreamConsumer stdErr = new StreamConsumer(process.getErrorStream());
+            final Thread stdErrThread = new Thread(stdErr);
 
+            stdOutThread.start();
+            stdErrThread.start();
+
+            stdOutThread.join();
+            stdErrThread.join();
             process.waitFor();
 
+            final String errorContents = stdErr.toString();
+            if (errorContents.length() > 0) {
+                throw new AuthorizationException("subprocess_error", errorContents, null, null);
+            }
+            final String response = stdOut.toString();
             return AuthorizationResponse.fromString(response);
         }
         catch (final IOException e) {

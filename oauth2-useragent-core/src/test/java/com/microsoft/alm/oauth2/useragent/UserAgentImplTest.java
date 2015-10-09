@@ -70,4 +70,27 @@ public class UserAgentImplTest {
         Assert.assertEquals(authorizationEndpoint + NEW_LINE + redirectUri + NEW_LINE, actualStdout);
 
     }
+
+    @Test public void encode_programmingError() throws AuthorizationException, IOException {
+        final String authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/authorize?resource=foo&client_id=bar&response_type=code&redirect_uri=https%3A//redirect.example.com";
+        final String redirectUri = "https://redirect.example.com";
+        final String stackTrace = "Exception in Application start method";
+        final TestProcess process = new TestProcess("", stackTrace);
+        final TestableProcessFactory processFactory = new TestableProcessFactory() {
+            @Override public TestableProcess create(final String... args) throws IOException {
+                return process;
+            }
+        };
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
+
+        try {
+            cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
+        }
+        catch (final AuthorizationException e) {
+            Assert.assertEquals(stackTrace, e.getDescription().trim());
+            Assert.assertEquals("subprocess_error", e.getCode());
+            return;
+        }
+        Assert.fail("An AuthorizationException should have been thrown.");
+    }
 }
