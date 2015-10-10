@@ -6,6 +6,7 @@ package com.microsoft.alm.oauth2.useragent;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -28,6 +29,28 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
 
     public InterceptingBrowser() {
         webEngine.locationProperty().addListener(this);
+        final Worker<Void> loadWorker = webEngine.getLoadWorker();
+        loadWorker.stateProperty().addListener(new ChangeListener<Worker.State>() {
+            public void changed(final ObservableValue<? extends Worker.State> observable, final Worker.State oldValue, final Worker.State newValue) {
+                lock.lock();
+                try {
+                    if (Worker.State.FAILED.equals(newValue)) {
+                        final Throwable exception = loadWorker.getException();
+                        if (exception != null) {
+                            response = AuthorizationException.toString("load_error", exception, null);
+                        }
+                        else {
+                            response = AuthorizationException.toString("load_error", "Exception details were not available", null);
+                        }
+                        responseReceived.signal();
+                    }
+                }
+                finally {
+                    lock.unlock();
+                }
+            }
+        });
+
         getChildren().add(webView);
     }
 
