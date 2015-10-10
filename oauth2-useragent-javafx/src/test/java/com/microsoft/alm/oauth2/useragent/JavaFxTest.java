@@ -31,6 +31,10 @@ public class JavaFxTest {
         final Exception expectedException = this.expectedExceptionRef.get();
         if (expectedException == null) {
             if (actualException != null) {
+                if (actualException instanceof AuthorizationException) {
+                    final AuthorizationException authorizationException = (AuthorizationException) actualException;
+                    Assert.fail(authorizationException.getMessage() + UserAgentImpl.NEW_LINE + authorizationException.getDescription());
+                }
                 throw new Error(actualException);
             }
         }
@@ -43,6 +47,13 @@ public class JavaFxTest {
             else {
                 Assert.assertEquals(expectedException.getClass(), actualException.getClass());
                 Assert.assertEquals(expectedException.getMessage(), actualException.getMessage());
+                if (actualException instanceof AuthorizationException) {
+                    final AuthorizationException expectedAuthz = (AuthorizationException) expectedException;
+                    final AuthorizationException actualAuthz = (AuthorizationException) actualException;
+                    final String prefix = expectedAuthz.getDescription();
+                    final String firstPart = actualAuthz.getDescription().substring(0, prefix.length());
+                    Assert.assertEquals(actualAuthz.getDescription(), prefix, firstPart);
+                }
             }
         }
     }
