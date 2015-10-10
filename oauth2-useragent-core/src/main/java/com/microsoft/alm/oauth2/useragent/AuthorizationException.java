@@ -3,6 +3,8 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -44,6 +46,14 @@ public class AuthorizationException extends Exception {
 
     @Override public String toString() {
         return toString(this.code, this.description, this.uri);
+    }
+
+    public static String toString(final String code, final Throwable throwable, final URI uri) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream printStream = new PrintStream(baos);
+        throwable.printStackTrace(printStream);
+        final String description = baos.toString();
+        return toString(code, description, uri);
     }
 
     public static String toString(final String code, final String description, final URI uri) {
