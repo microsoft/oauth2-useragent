@@ -52,7 +52,7 @@ public class JavaFx extends Application implements UserAgent, Runnable, Runnable
     @Override
     public void start(final Stage primaryStage) throws Exception {
         // TODO: it would be nice if we could prepend the title with a user-supplied string
-        primaryStage.setTitle("OAuth2 Authorization Request");
+        primaryStage.setTitle("OAuth 2.0 Authorization Request");
 
         // TODO: consider adding a way to inspect the connection security/certificate
         final TextField addressBar = new TextField();

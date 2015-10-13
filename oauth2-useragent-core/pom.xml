@@ -14,7 +14,7 @@
   <artifactId>oauth2-useragent-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>SDK for Microsoft OAuth2 User Agent library for Java</name>
+  <name>SDK for Microsoft OAuth 2.0 User Agent library for Java</name>
 
   <build>
     <plugins>

@@ -11,7 +11,7 @@
   <version>0.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Parent for Microsoft OAuth2 User Agent library for Java</name>
+  <name>Parent for Microsoft OAuth 2.0 User Agent library for Java</name>
   <url>https://www.visualstudio.com/downloads/download-visual-studio-vs</url>
 
   <licenses>

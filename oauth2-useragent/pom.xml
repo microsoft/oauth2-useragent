@@ -14,7 +14,7 @@
   <artifactId>oauth2-useragent</artifactId>
   <packaging>jar</packaging>
 
-  <name>Microsoft OAuth2 User Agent library for Java</name>
+  <name>Microsoft OAuth 2.0 User Agent library for Java</name>
   <description>Provides classes to facilitate the implementation of "4.1. Authorization Code Grant" from RFC 6749, specifically by auto-detecting a suitable user-agent (and informing the user if any system requirements are unmet and preventing the use of a user-agent), launching the user-agent and directing it to the authorization endpoint, waiting for the results and returning either the authorization code or the reason for failure.</description>
 
   <build>

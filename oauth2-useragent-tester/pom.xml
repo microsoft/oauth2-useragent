@@ -14,7 +14,7 @@
   <artifactId>oauth2-useragent-tester</artifactId>
   <packaging>jar</packaging>
 
-  <name>Microsoft OAuth2 User Agent library tester</name>
+  <name>Microsoft OAuth 2.0 User Agent library tester</name>
 
   <build>
     <plugins>
