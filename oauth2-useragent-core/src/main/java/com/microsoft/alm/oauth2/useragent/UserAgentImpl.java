@@ -14,9 +14,11 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public class UserAgentImpl implements UserAgent {
 
@@ -232,8 +234,13 @@ public class UserAgentImpl implements UserAgent {
 
     static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
         destination.append("# --- BEGIN ENVIRONMENT VARIABLES ---").append(NEW_LINE).append(NEW_LINE);
-        for (final Map.Entry<String, String> entry : variables.entrySet()) {
-            destination.append(entry.getKey()).append('=').append(entry.getValue()).append(NEW_LINE);
+        final Set<String> keys = variables.keySet();
+        final String[] keyArray = new String[keys.size()];
+        keys.toArray(keyArray);
+        Arrays.sort(keyArray);
+        for (final String key : keyArray) {
+            final String value = variables.get(key);
+            destination.append(key).append('=').append(value).append(NEW_LINE);
         }
         destination.append(NEW_LINE).append("# ---- END ENVIRONMENT VARIABLES ----").append(NEW_LINE);
     }

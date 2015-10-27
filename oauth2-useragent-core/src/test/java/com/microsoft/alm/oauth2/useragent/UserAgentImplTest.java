@@ -124,9 +124,9 @@ public class UserAgentImplTest {
     @Test public void appendVariables_Typical() throws Exception {
         final StringBuilder sb = new StringBuilder();
         final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
-        variables.put("HOME", "/home/example");
-        variables.put("PATH", "C:/Windows/System32;C:/Windows");
         variables.put("TMPDIR", "/var/folders/2f9992f171054fccabbdb978d49a2511");
+        variables.put("PATH", "C:/Windows/System32;C:/Windows");
+        variables.put("HOME", "/home/example");
 
         UserAgentImpl.appendVariables(variables, sb);
 
