@@ -29,10 +29,10 @@ public class UserAgentImpl implements UserAgent {
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final TestableProcessFactory processFactory;
-    private final Provider provider;
+    private Provider provider;
 
     public UserAgentImpl() {
-        this(new DefaultProcessFactory(), determineProvider(System.getProperty("userAgentProvider")));
+        this(new DefaultProcessFactory(), null);
     }
 
     UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider) {
@@ -92,6 +92,10 @@ public class UserAgentImpl implements UserAgent {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
+        if (provider == null) {
+            final String userAgentProvider = System.getProperty("userAgentProvider");
+            provider = determineProvider(userAgentProvider);
+        }
         provider.augmentProcessParameters(command, classPath);
         // TODO: is this the best way to add our JAR?
         classPath.add(System.getProperty("java.class.path"));
