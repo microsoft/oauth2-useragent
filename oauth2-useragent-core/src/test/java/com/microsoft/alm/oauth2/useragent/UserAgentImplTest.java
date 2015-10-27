@@ -197,11 +197,30 @@ public class UserAgentImplTest {
             final StringReader sr = new StringReader(actual);
             try {
                 final BufferedReader br = new BufferedReader(sr);
-                Assert.assertEquals("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.", br.readLine());
+                Assert.assertEquals("I don't support your platform yet.", br.readLine());
                 Assert.assertEquals("Unmet requirements for the 'Incompatible' provider:", br.readLine());
                 Assert.assertEquals(" - You must construct additional Pylons.", br.readLine());
                 Assert.assertEquals(" - You have not enough minerals.", br.readLine());
                 Assert.assertEquals(" - Insufficient Vespene gas.", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                Assert.assertEquals("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.", br.readLine());
+                Assert.assertEquals("The following System Properties and Environment Variables would be very useful.", br.readLine());
+                Assert.assertEquals("# --- BEGIN SYSTEM PROPERTIES ---", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.equals("# ---- END SYSTEM PROPERTIES ----")) {
+                        break;
+                    }
+                }
+                Assert.assertEquals("", br.readLine());
+                Assert.assertEquals("# --- BEGIN ENVIRONMENT VARIABLES ---", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                while ((line = br.readLine()) != null) {
+                    if (line.equals("# ---- END ENVIRONMENT VARIABLES ----")) {
+                        break;
+                    }
+                }
                 Assert.assertEquals(null, br.readLine());
             }
             finally {

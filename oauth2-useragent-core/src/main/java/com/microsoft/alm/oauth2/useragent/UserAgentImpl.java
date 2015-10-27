@@ -178,7 +178,7 @@ public class UserAgentImpl implements UserAgent {
                 }
             }
         }
-        final StringBuilder sb = new StringBuilder("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+        final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
         for (final Provider provider : providers) {
             final List<String> requirements = provider.checkRequirements();
             if (requirements == null || requirements.size() == 0) {
@@ -190,6 +190,19 @@ public class UserAgentImpl implements UserAgent {
                 sb.append(" - ").append(requirement).append(NEW_LINE);
             }
         }
+        sb.append(NEW_LINE);
+        sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+        sb.append(NEW_LINE);
+        sb.append("The following System Properties and Environment Variables would be very useful.");
+        sb.append(NEW_LINE);
+
+        final Properties properties = System.getProperties();
+        appendProperties(properties, sb);
+        sb.append(NEW_LINE);
+
+        final Map<String, String> variables = System.getenv();
+        appendVariables(variables, sb);
+
         throw new IllegalStateException(sb.toString());
     }
 
