@@ -4,6 +4,7 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class UserAgentImpl implements UserAgent {
 
@@ -185,6 +187,26 @@ public class UserAgentImpl implements UserAgent {
             }
         }
         throw new IllegalStateException(sb.toString());
+    }
+
+    static void appendProperties(final Properties properties, final StringBuilder destination) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        destination.append("# --- BEGIN SYSTEM PROPERTIES ---").append(NEW_LINE).append(NEW_LINE);
+        try {
+            properties.store(baos, null);
+            destination.append(baos.toString()).append(NEW_LINE);
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            try {
+                baos.close();
+            }
+            catch (final IOException ignored) {
+            }
+        }
+        destination.append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {

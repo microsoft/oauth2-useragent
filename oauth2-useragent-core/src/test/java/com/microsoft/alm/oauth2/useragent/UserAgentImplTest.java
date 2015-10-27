@@ -8,12 +8,16 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class UserAgentImplTest {
 
@@ -92,5 +96,44 @@ public class UserAgentImplTest {
             return;
         }
         Assert.fail("An AuthorizationException should have been thrown.");
+    }
+
+    @Test public void appendProperties_Typical() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final Properties properties = new Properties();
+        properties.put("name", "value");
+        properties.put("ping", "pong");
+
+        UserAgentImpl.appendProperties(properties, sb);
+
+        assertLinesMatch(sb.toString(),
+                "# --- BEGIN SYSTEM PROPERTIES ---",
+                "",
+                "#.+",
+                "name=value",
+                "ping=pong",
+                "",
+                "# ---- END SYSTEM PROPERTIES ----"
+        );
+    }
+
+    private static void assertLinesMatch(final String actual, final String... expectedPatterns) {
+        final StringReader sr = new StringReader(actual);
+        try {
+            final BufferedReader br = new BufferedReader(sr);
+            for (final String ePattern : expectedPatterns) {
+                final String aLine = br.readLine();
+                final boolean matches = Pattern.matches(ePattern, aLine);
+                if (!matches) {
+                    Assert.fail("Line '" + aLine + "' did not match pattern '" + ePattern + "'.");
+                }
+            }
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            sr.close();
+        }
     }
 }
