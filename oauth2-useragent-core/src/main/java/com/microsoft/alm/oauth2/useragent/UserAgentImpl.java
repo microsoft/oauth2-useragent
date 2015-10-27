@@ -165,18 +165,21 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
-    // TODO: this method could be more testable if it accepted a list of providers as a parameter
     static Provider determineProvider(final String userAgentProvider) {
+        return determineProvider(userAgentProvider, Provider.PROVIDERS);
+    }
+
+    static Provider determineProvider(final String userAgentProvider, final List<Provider> providers) {
 
         if (userAgentProvider != null) {
-            for (final Provider provider : Provider.PROVIDERS) {
+            for (final Provider provider : providers) {
                 if (provider.getClassName().equals(userAgentProvider)) {
                     return provider;
                 }
             }
         }
         final StringBuilder sb = new StringBuilder("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
-        for (final Provider provider : Provider.PROVIDERS) {
+        for (final Provider provider : providers) {
             final List<String> requirements = provider.checkRequirements();
             if (requirements == null || requirements.size() == 0) {
                 return provider;

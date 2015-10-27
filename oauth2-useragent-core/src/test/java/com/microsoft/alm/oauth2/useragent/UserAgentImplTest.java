@@ -16,7 +16,10 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -155,6 +158,75 @@ public class UserAgentImplTest {
         }
         finally {
             sr.close();
+        }
+    }
+
+    @Test public void determineProvider_Compatible() {
+        final Provider compatibleProvider = new CompatibleProvider();
+        //noinspection ArraysAsListWithZeroOrOneArgument
+        final List<Provider> providers = Arrays.asList(compatibleProvider);
+
+        final Provider actual = UserAgentImpl.determineProvider(null, providers);
+
+        Assert.assertEquals(compatibleProvider, actual);
+    }
+
+    private static class CompatibleProvider extends Provider {
+        public CompatibleProvider() {
+            super("Compatible");
+        }
+
+        @Override public List<String> checkRequirements() {
+            return Collections.emptyList();
+        }
+
+        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
+        }
+    }
+
+    @Test public void determineProvider_Incompatible() throws IOException {
+        final Provider incompatibleProvider = new IncompatibleProvider();
+        //noinspection ArraysAsListWithZeroOrOneArgument
+        final List<Provider> providers = Arrays.asList(incompatibleProvider);
+
+        try {
+            UserAgentImpl.determineProvider(null, providers);
+        }
+        catch (final IllegalStateException e) {
+            final String actual = e.getMessage();
+            final StringReader sr = new StringReader(actual);
+            try {
+                final BufferedReader br = new BufferedReader(sr);
+                Assert.assertEquals("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.", br.readLine());
+                Assert.assertEquals("Unmet requirements for the 'Incompatible' provider:", br.readLine());
+                Assert.assertEquals(" - You must construct additional Pylons.", br.readLine());
+                Assert.assertEquals(" - You have not enough minerals.", br.readLine());
+                Assert.assertEquals(" - Insufficient Vespene gas.", br.readLine());
+                Assert.assertEquals(null, br.readLine());
+            }
+            finally {
+                sr.close();
+            }
+            return;
+        }
+        Assert.fail("An IllegalStateException should have been thrown");
+    }
+
+    private static class IncompatibleProvider extends Provider {
+        private static final List<String> MISSING_PREREQUISITES = Arrays.asList(
+                "You must construct additional Pylons.",
+                "You have not enough minerals.",
+                "Insufficient Vespene gas."
+        );
+        public IncompatibleProvider() {
+            super("Incompatible");
+        }
+
+        @Override public List<String> checkRequirements() {
+            return MISSING_PREREQUISITES;
+        }
+
+        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
         }
     }
 }
