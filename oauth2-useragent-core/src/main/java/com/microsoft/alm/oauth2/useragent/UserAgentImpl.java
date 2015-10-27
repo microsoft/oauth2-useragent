@@ -4,6 +4,7 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class UserAgentImpl implements UserAgent {
 
@@ -162,20 +165,23 @@ public class UserAgentImpl implements UserAgent {
         return result.toString();
     }
 
-    // TODO: this method could be more testable if it accepted a list of providers as a parameter
     static Provider determineProvider(final String userAgentProvider) {
+        return determineProvider(userAgentProvider, Provider.PROVIDERS);
+    }
+
+    static Provider determineProvider(final String userAgentProvider, final List<Provider> providers) {
 
         if (userAgentProvider != null) {
-            for (final Provider provider : Provider.PROVIDERS) {
+            for (final Provider provider : providers) {
                 if (provider.getClassName().equals(userAgentProvider)) {
                     return provider;
                 }
             }
         }
-        final StringBuilder sb = new StringBuilder("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
-        for (final Provider provider : Provider.PROVIDERS) {
+        final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
+        for (final Provider provider : providers) {
             final List<String> requirements = provider.checkRequirements();
-            if (requirements.size() == 0) {
+            if (requirements == null || requirements.size() == 0) {
                 return provider;
             }
             sb.append(NEW_LINE);
@@ -184,7 +190,48 @@ public class UserAgentImpl implements UserAgent {
                 sb.append(" - ").append(requirement).append(NEW_LINE);
             }
         }
+        sb.append(NEW_LINE);
+        sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+        sb.append(NEW_LINE);
+        sb.append("The following System Properties and Environment Variables would be very useful.");
+        sb.append(NEW_LINE);
+
+        final Properties properties = System.getProperties();
+        appendProperties(properties, sb);
+        sb.append(NEW_LINE);
+
+        final Map<String, String> variables = System.getenv();
+        appendVariables(variables, sb);
+
         throw new IllegalStateException(sb.toString());
+    }
+
+    static void appendProperties(final Properties properties, final StringBuilder destination) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        destination.append("# --- BEGIN SYSTEM PROPERTIES ---").append(NEW_LINE).append(NEW_LINE);
+        try {
+            properties.store(baos, null);
+            destination.append(baos.toString()).append(NEW_LINE);
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            try {
+                baos.close();
+            }
+            catch (final IOException ignored) {
+            }
+        }
+        destination.append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
+    }
+
+    static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
+        destination.append("# --- BEGIN ENVIRONMENT VARIABLES ---").append(NEW_LINE).append(NEW_LINE);
+        for (final Map.Entry<String, String> entry : variables.entrySet()) {
+            destination.append(entry.getKey()).append('=').append(entry.getValue()).append(NEW_LINE);
+        }
+        destination.append(NEW_LINE).append("# ---- END ENVIRONMENT VARIABLES ----").append(NEW_LINE);
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {

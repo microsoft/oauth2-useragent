@@ -8,12 +8,20 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class UserAgentImplTest {
 
@@ -92,5 +100,152 @@ public class UserAgentImplTest {
             return;
         }
         Assert.fail("An AuthorizationException should have been thrown.");
+    }
+
+    @Test public void appendProperties_Typical() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final Properties properties = new Properties();
+        properties.put("name", "value");
+        properties.put("ping", "pong");
+
+        UserAgentImpl.appendProperties(properties, sb);
+
+        assertLinesMatch(sb.toString(),
+                "# --- BEGIN SYSTEM PROPERTIES ---",
+                "",
+                "#.+",
+                "name=value",
+                "ping=pong",
+                "",
+                "# ---- END SYSTEM PROPERTIES ----"
+        );
+    }
+
+    @Test public void appendVariables_Typical() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
+        variables.put("HOME", "/home/example");
+        variables.put("PATH", "C:/Windows/System32;C:/Windows");
+        variables.put("TMPDIR", "/var/folders/2f9992f171054fccabbdb978d49a2511");
+
+        UserAgentImpl.appendVariables(variables, sb);
+
+        assertLinesMatch(sb.toString(),
+                "# --- BEGIN ENVIRONMENT VARIABLES ---",
+                "",
+                "HOME=/home/example",
+                "PATH=C:/Windows/System32;C:/Windows",
+                "TMPDIR=/var/folders/2f9992f171054fccabbdb978d49a2511",
+                "",
+                "# ---- END ENVIRONMENT VARIABLES ----"
+        );
+    }
+
+    private static void assertLinesMatch(final String actual, final String... expectedPatterns) {
+        final StringReader sr = new StringReader(actual);
+        try {
+            final BufferedReader br = new BufferedReader(sr);
+            for (final String ePattern : expectedPatterns) {
+                final String aLine = br.readLine();
+                final boolean matches = Pattern.matches(ePattern, aLine);
+                if (!matches) {
+                    Assert.fail("Line '" + aLine + "' did not match pattern '" + ePattern + "'.");
+                }
+            }
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            sr.close();
+        }
+    }
+
+    @Test public void determineProvider_Compatible() {
+        final Provider compatibleProvider = new CompatibleProvider();
+        //noinspection ArraysAsListWithZeroOrOneArgument
+        final List<Provider> providers = Arrays.asList(compatibleProvider);
+
+        final Provider actual = UserAgentImpl.determineProvider(null, providers);
+
+        Assert.assertEquals(compatibleProvider, actual);
+    }
+
+    private static class CompatibleProvider extends Provider {
+        public CompatibleProvider() {
+            super("Compatible");
+        }
+
+        @Override public List<String> checkRequirements() {
+            return Collections.emptyList();
+        }
+
+        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
+        }
+    }
+
+    @Test public void determineProvider_Incompatible() throws IOException {
+        final Provider incompatibleProvider = new IncompatibleProvider();
+        //noinspection ArraysAsListWithZeroOrOneArgument
+        final List<Provider> providers = Arrays.asList(incompatibleProvider);
+
+        try {
+            UserAgentImpl.determineProvider(null, providers);
+        }
+        catch (final IllegalStateException e) {
+            final String actual = e.getMessage();
+            final StringReader sr = new StringReader(actual);
+            try {
+                final BufferedReader br = new BufferedReader(sr);
+                Assert.assertEquals("I don't support your platform yet.", br.readLine());
+                Assert.assertEquals("Unmet requirements for the 'Incompatible' provider:", br.readLine());
+                Assert.assertEquals(" - You must construct additional Pylons.", br.readLine());
+                Assert.assertEquals(" - You have not enough minerals.", br.readLine());
+                Assert.assertEquals(" - Insufficient Vespene gas.", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                Assert.assertEquals("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.", br.readLine());
+                Assert.assertEquals("The following System Properties and Environment Variables would be very useful.", br.readLine());
+                Assert.assertEquals("# --- BEGIN SYSTEM PROPERTIES ---", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.equals("# ---- END SYSTEM PROPERTIES ----")) {
+                        break;
+                    }
+                }
+                Assert.assertEquals("", br.readLine());
+                Assert.assertEquals("# --- BEGIN ENVIRONMENT VARIABLES ---", br.readLine());
+                Assert.assertEquals("", br.readLine());
+                while ((line = br.readLine()) != null) {
+                    if (line.equals("# ---- END ENVIRONMENT VARIABLES ----")) {
+                        break;
+                    }
+                }
+                Assert.assertEquals(null, br.readLine());
+            }
+            finally {
+                sr.close();
+            }
+            return;
+        }
+        Assert.fail("An IllegalStateException should have been thrown");
+    }
+
+    private static class IncompatibleProvider extends Provider {
+        private static final List<String> MISSING_PREREQUISITES = Arrays.asList(
+                "You must construct additional Pylons.",
+                "You have not enough minerals.",
+                "Insufficient Vespene gas."
+        );
+        public IncompatibleProvider() {
+            super("Incompatible");
+        }
+
+        @Override public List<String> checkRequirements() {
+            return MISSING_PREREQUISITES;
+        }
+
+        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
+        }
     }
 }
