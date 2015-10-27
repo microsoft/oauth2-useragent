@@ -178,7 +178,7 @@ public class UserAgentImpl implements UserAgent {
         final StringBuilder sb = new StringBuilder("I don't support your platform yet.  Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
         for (final Provider provider : Provider.PROVIDERS) {
             final List<String> requirements = provider.checkRequirements();
-            if (requirements.size() == 0) {
+            if (requirements == null || requirements.size() == 0) {
                 return provider;
             }
             sb.append(NEW_LINE);
