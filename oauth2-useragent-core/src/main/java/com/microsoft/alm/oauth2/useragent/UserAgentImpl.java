@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class UserAgentImpl implements UserAgent {
@@ -207,6 +208,14 @@ public class UserAgentImpl implements UserAgent {
             }
         }
         destination.append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
+    }
+
+    static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
+        destination.append("# --- BEGIN ENVIRONMENT VARIABLES ---").append(NEW_LINE).append(NEW_LINE);
+        for (final Map.Entry<String, String> entry : variables.entrySet()) {
+            destination.append(entry.getKey()).append('=').append(entry.getValue()).append(NEW_LINE);
+        }
+        destination.append(NEW_LINE).append("# ---- END ENVIRONMENT VARIABLES ----").append(NEW_LINE);
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {

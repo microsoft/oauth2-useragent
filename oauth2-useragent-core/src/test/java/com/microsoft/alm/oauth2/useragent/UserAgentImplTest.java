@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -114,6 +115,26 @@ public class UserAgentImplTest {
                 "ping=pong",
                 "",
                 "# ---- END SYSTEM PROPERTIES ----"
+        );
+    }
+
+    @Test public void appendVariables_Typical() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
+        variables.put("HOME", "/home/example");
+        variables.put("PATH", "C:/Windows/System32;C:/Windows");
+        variables.put("TMPDIR", "/var/folders/2f9992f171054fccabbdb978d49a2511");
+
+        UserAgentImpl.appendVariables(variables, sb);
+
+        assertLinesMatch(sb.toString(),
+                "# --- BEGIN ENVIRONMENT VARIABLES ---",
+                "",
+                "HOME=/home/example",
+                "PATH=C:/Windows/System32;C:/Windows",
+                "TMPDIR=/var/folders/2f9992f171054fccabbdb978d49a2511",
+                "",
+                "# ---- END ENVIRONMENT VARIABLES ----"
         );
     }
 
