@@ -111,7 +111,7 @@ public class UserAgentImplTest {
 
         UserAgentImpl.appendProperties(properties, sb);
 
-        assertLinesMatch(sb.toString(),
+        assertLinesEqual(sb.toString(),
                 "# --- BEGIN SYSTEM PROPERTIES ---",
                 "",
                 "bing=bong",
@@ -131,7 +131,7 @@ public class UserAgentImplTest {
 
         UserAgentImpl.appendVariables(variables, sb);
 
-        assertLinesMatch(sb.toString(),
+        assertLinesEqual(sb.toString(),
                 "# --- BEGIN ENVIRONMENT VARIABLES ---",
                 "",
                 "HOME=/home/example",
@@ -140,6 +140,23 @@ public class UserAgentImplTest {
                 "",
                 "# ---- END ENVIRONMENT VARIABLES ----"
         );
+    }
+
+    private static void assertLinesEqual(final String actual, final String... expectedLines) {
+        final StringReader sr = new StringReader(actual);
+        try {
+            final BufferedReader br = new BufferedReader(sr);
+            for (final String eLine : expectedLines) {
+                final String aLine = br.readLine();
+                Assert.assertEquals(eLine, aLine);
+            }
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            sr.close();
+        }
     }
 
     private static void assertLinesMatch(final String actual, final String... expectedPatterns) {
