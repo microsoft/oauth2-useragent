@@ -212,29 +212,32 @@ public class UserAgentImpl implements UserAgent {
     }
 
     static void appendProperties(final Properties properties, final StringBuilder destination) {
-        destination.append("# --- BEGIN SYSTEM PROPERTIES ---").append(NEW_LINE).append(NEW_LINE);
+        final String header = "# --- BEGIN SYSTEM PROPERTIES ---";
+        final String footer = "# ---- END SYSTEM PROPERTIES ----";
         final Set<String> keys = properties.stringPropertyNames();
-        final String[] keyArray = new String[keys.size()];
-        keys.toArray(keyArray);
-        Arrays.sort(keyArray);
-        for (final String key : keyArray) {
-            final String value = properties.getProperty(key);
-            destination.append(key).append('=').append(value).append(NEW_LINE);
-        }
-        destination.append(NEW_LINE).append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
+
+        appendPairs(keys, properties, destination, header, footer);
     }
 
     static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
-        destination.append("# --- BEGIN ENVIRONMENT VARIABLES ---").append(NEW_LINE).append(NEW_LINE);
+        final String header = "# --- BEGIN ENVIRONMENT VARIABLES ---";
+        final String footer = "# ---- END ENVIRONMENT VARIABLES ----";
         final Set<String> keys = variables.keySet();
+
+        appendPairs(keys, variables, destination, header, footer);
+    }
+
+    static void appendPairs(final Set<String> keys, final Map pairs, final StringBuilder destination, final String header, final String footer) {
+        destination.append(header).append(NEW_LINE).append(NEW_LINE);
         final String[] keyArray = new String[keys.size()];
         keys.toArray(keyArray);
         Arrays.sort(keyArray);
         for (final String key : keyArray) {
-            final String value = variables.get(key);
+            final String value = (String) pairs.get(key);
+            // TODO: encode value (i.e. line.separator is '\n', plus there could be diacritics)
             destination.append(key).append('=').append(value).append(NEW_LINE);
         }
-        destination.append(NEW_LINE).append("# ---- END ENVIRONMENT VARIABLES ----").append(NEW_LINE);
+        destination.append(NEW_LINE).append(footer).append(NEW_LINE);
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {
