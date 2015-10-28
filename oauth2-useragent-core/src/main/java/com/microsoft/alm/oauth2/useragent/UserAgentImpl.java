@@ -252,11 +252,11 @@ public class UserAgentImpl implements UserAgent {
         keys.toArray(keyArray);
         Arrays.sort(keyArray);
         for (final String key : keyArray) {
+            final String encodedKey = sortOfUrlEncode(key);
+
             final String value = (String) pairs.get(key);
-            final String encodedKey;
-            final String encodedValue;
-            encodedKey = sortOfUrlEncode(key);
-            encodedValue = sortOfUrlEncode(value);
+            final String encodedValue = sortOfUrlEncode(value);
+
             destination.append(encodedKey).append('=').append(encodedValue).append(NEW_LINE);
         }
         destination.append(NEW_LINE).append(footer).append(NEW_LINE);
