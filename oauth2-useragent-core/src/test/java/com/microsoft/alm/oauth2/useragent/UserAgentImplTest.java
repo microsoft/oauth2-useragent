@@ -107,13 +107,14 @@ public class UserAgentImplTest {
         final Properties properties = new Properties();
         properties.put("name", "value");
         properties.put("ping", "pong");
+        properties.put("bing", "bong");
 
         UserAgentImpl.appendProperties(properties, sb);
 
         assertLinesMatch(sb.toString(),
                 "# --- BEGIN SYSTEM PROPERTIES ---",
                 "",
-                "#.+",
+                "bing=bong",
                 "name=value",
                 "ping=pong",
                 "",

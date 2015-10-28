@@ -4,7 +4,6 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -213,23 +212,16 @@ public class UserAgentImpl implements UserAgent {
     }
 
     static void appendProperties(final Properties properties, final StringBuilder destination) {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         destination.append("# --- BEGIN SYSTEM PROPERTIES ---").append(NEW_LINE).append(NEW_LINE);
-        try {
-            properties.store(baos, null);
-            destination.append(baos.toString()).append(NEW_LINE);
+        final Set<String> keys = properties.stringPropertyNames();
+        final String[] keyArray = new String[keys.size()];
+        keys.toArray(keyArray);
+        Arrays.sort(keyArray);
+        for (final String key : keyArray) {
+            final String value = properties.getProperty(key);
+            destination.append(key).append('=').append(value).append(NEW_LINE);
         }
-        catch (final IOException e) {
-            throw new Error(e);
-        }
-        finally {
-            try {
-                baos.close();
-            }
-            catch (final IOException ignored) {
-            }
-        }
-        destination.append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
+        destination.append(NEW_LINE).append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
     }
 
     static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
