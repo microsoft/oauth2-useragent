@@ -4,19 +4,24 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public class UserAgentImpl implements UserAgent {
 
@@ -25,8 +30,23 @@ public class UserAgentImpl implements UserAgent {
     static final String JAVA_HOME = System.getProperty("java.home");
     static final String PATH_SEPARATOR = System.getProperty("path.separator");
     static final String NEW_LINE = System.getProperty("line.separator");
+    static final String UTF_8 = "UTF-8";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final Map<String, String> SAFE_REPLACEMENTS;
+
+    static {
+        final HashMap<String, String> map = new HashMap<String, String>();
+        map.put("+", " ");
+        map.put("%28", "(");
+        map.put("%29", ")");
+        map.put("%2F", "/");
+        map.put("%3A", ":");
+        map.put("%3B", ";");
+        map.put("%5C", "\\");
+        map.put("%7C", "|");
+        SAFE_REPLACEMENTS = Collections.unmodifiableMap(map);
+    }
 
     private final TestableProcessFactory processFactory;
     private Provider provider;
@@ -211,31 +231,51 @@ public class UserAgentImpl implements UserAgent {
     }
 
     static void appendProperties(final Properties properties, final StringBuilder destination) {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        destination.append("# --- BEGIN SYSTEM PROPERTIES ---").append(NEW_LINE).append(NEW_LINE);
-        try {
-            properties.store(baos, null);
-            destination.append(baos.toString()).append(NEW_LINE);
-        }
-        catch (final IOException e) {
-            throw new Error(e);
-        }
-        finally {
-            try {
-                baos.close();
-            }
-            catch (final IOException ignored) {
-            }
-        }
-        destination.append("# ---- END SYSTEM PROPERTIES ----").append(NEW_LINE);
+        final String header = "# --- BEGIN SYSTEM PROPERTIES ---";
+        final String footer = "# ---- END SYSTEM PROPERTIES ----";
+        final Set<String> keys = properties.stringPropertyNames();
+
+        appendPairs(keys, properties, destination, header, footer);
     }
 
     static void appendVariables(final Map<String, String> variables, final StringBuilder destination) {
-        destination.append("# --- BEGIN ENVIRONMENT VARIABLES ---").append(NEW_LINE).append(NEW_LINE);
-        for (final Map.Entry<String, String> entry : variables.entrySet()) {
-            destination.append(entry.getKey()).append('=').append(entry.getValue()).append(NEW_LINE);
+        final String header = "# --- BEGIN ENVIRONMENT VARIABLES ---";
+        final String footer = "# ---- END ENVIRONMENT VARIABLES ----";
+        final Set<String> keys = variables.keySet();
+
+        appendPairs(keys, variables, destination, header, footer);
+    }
+
+    static void appendPairs(final Set<String> keys, final Map pairs, final StringBuilder destination, final String header, final String footer) {
+        destination.append(header).append(NEW_LINE).append(NEW_LINE);
+        final String[] keyArray = new String[keys.size()];
+        keys.toArray(keyArray);
+        Arrays.sort(keyArray);
+        for (final String key : keyArray) {
+            final String encodedKey = sortOfUrlEncode(key);
+
+            final String value = (String) pairs.get(key);
+            final String encodedValue = sortOfUrlEncode(value);
+
+            destination.append(encodedKey).append('=').append(encodedValue).append(NEW_LINE);
         }
-        destination.append(NEW_LINE).append("# ---- END ENVIRONMENT VARIABLES ----").append(NEW_LINE);
+        destination.append(NEW_LINE).append(footer).append(NEW_LINE);
+    }
+
+    static String sortOfUrlEncode(final String s) {
+        try {
+            //noinspection UnnecessaryLocalVariable
+            final String encoded = URLEncoder.encode(s, UTF_8);
+            // encode() goes too far for our purposes, so undo some common ones for easier raw inspection
+            String result = encoded;
+            for (final Map.Entry<String, String> entry : SAFE_REPLACEMENTS.entrySet()) {
+                result = result.replace(entry.getKey(), entry.getValue());
+            }
+            return result;
+        }
+        catch (final UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {

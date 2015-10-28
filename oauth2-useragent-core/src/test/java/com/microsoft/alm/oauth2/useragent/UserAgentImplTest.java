@@ -105,17 +105,18 @@ public class UserAgentImplTest {
     @Test public void appendProperties_Typical() throws Exception {
         final StringBuilder sb = new StringBuilder();
         final Properties properties = new Properties();
-        properties.put("name", "value");
-        properties.put("ping", "pong");
+        properties.put("name", "v\\a|u/e");
+        properties.put("ping", "pöng");
+        properties.put("bing", "(b-o_n.g)");
 
         UserAgentImpl.appendProperties(properties, sb);
 
-        assertLinesMatch(sb.toString(),
+        assertLinesEqual(sb.toString(),
                 "# --- BEGIN SYSTEM PROPERTIES ---",
                 "",
-                "#.+",
-                "name=value",
-                "ping=pong",
+                "bing=(b-o_n.g)",
+                "name=v\\a|u/e",
+                "ping=p%C3%B6ng",
                 "",
                 "# ---- END SYSTEM PROPERTIES ----"
         );
@@ -124,21 +125,38 @@ public class UserAgentImplTest {
     @Test public void appendVariables_Typical() throws Exception {
         final StringBuilder sb = new StringBuilder();
         final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
-        variables.put("HOME", "/home/example");
-        variables.put("PATH", "C:/Windows/System32;C:/Windows");
         variables.put("TMPDIR", "/var/folders/2f9992f171054fccabbdb978d49a2511");
+        variables.put("PATH", "C:/Windows/System32;C:/Windows");
+        variables.put("HOME", "/hömë/éxàmplè");
 
         UserAgentImpl.appendVariables(variables, sb);
 
-        assertLinesMatch(sb.toString(),
+        assertLinesEqual(sb.toString(),
                 "# --- BEGIN ENVIRONMENT VARIABLES ---",
                 "",
-                "HOME=/home/example",
+                "HOME=/h%C3%B6m%C3%AB/%C3%A9x%C3%A0mpl%C3%A8",
                 "PATH=C:/Windows/System32;C:/Windows",
                 "TMPDIR=/var/folders/2f9992f171054fccabbdb978d49a2511",
                 "",
                 "# ---- END ENVIRONMENT VARIABLES ----"
         );
+    }
+
+    private static void assertLinesEqual(final String actual, final String... expectedLines) {
+        final StringReader sr = new StringReader(actual);
+        try {
+            final BufferedReader br = new BufferedReader(sr);
+            for (final String eLine : expectedLines) {
+                final String aLine = br.readLine();
+                Assert.assertEquals(eLine, aLine);
+            }
+        }
+        catch (final IOException e) {
+            throw new Error(e);
+        }
+        finally {
+            sr.close();
+        }
     }
 
     private static void assertLinesMatch(final String actual, final String... expectedPatterns) {
