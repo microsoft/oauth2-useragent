@@ -105,18 +105,18 @@ public class UserAgentImplTest {
     @Test public void appendProperties_Typical() throws Exception {
         final StringBuilder sb = new StringBuilder();
         final Properties properties = new Properties();
-        properties.put("name", "value");
-        properties.put("ping", "pong");
-        properties.put("bing", "bong");
+        properties.put("name", "v\\a|u/e");
+        properties.put("ping", "pöng");
+        properties.put("bing", "(b-o_n.g)");
 
         UserAgentImpl.appendProperties(properties, sb);
 
         assertLinesEqual(sb.toString(),
                 "# --- BEGIN SYSTEM PROPERTIES ---",
                 "",
-                "bing=bong",
-                "name=value",
-                "ping=pong",
+                "bing=(b-o_n.g)",
+                "name=v\\a|u/e",
+                "ping=p%C3%B6ng",
                 "",
                 "# ---- END SYSTEM PROPERTIES ----"
         );
@@ -127,14 +127,14 @@ public class UserAgentImplTest {
         final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
         variables.put("TMPDIR", "/var/folders/2f9992f171054fccabbdb978d49a2511");
         variables.put("PATH", "C:/Windows/System32;C:/Windows");
-        variables.put("HOME", "/home/example");
+        variables.put("HOME", "/hömë/éxàmplè");
 
         UserAgentImpl.appendVariables(variables, sb);
 
         assertLinesEqual(sb.toString(),
                 "# --- BEGIN ENVIRONMENT VARIABLES ---",
                 "",
-                "HOME=/home/example",
+                "HOME=/h%C3%B6m%C3%AB/%C3%A9x%C3%A0mpl%C3%A8",
                 "PATH=C:/Windows/System32;C:/Windows",
                 "TMPDIR=/var/folders/2f9992f171054fccabbdb978d49a2511",
                 "",

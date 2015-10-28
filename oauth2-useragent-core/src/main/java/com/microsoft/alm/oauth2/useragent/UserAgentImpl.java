@@ -10,10 +10,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -26,8 +30,23 @@ public class UserAgentImpl implements UserAgent {
     static final String JAVA_HOME = System.getProperty("java.home");
     static final String PATH_SEPARATOR = System.getProperty("path.separator");
     static final String NEW_LINE = System.getProperty("line.separator");
+    static final String UTF_8 = "UTF-8";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final Map<String, String> SAFE_REPLACEMENTS;
+
+    static {
+        final HashMap<String, String> map = new HashMap<String, String>();
+        map.put("+", " ");
+        map.put("%28", "(");
+        map.put("%29", ")");
+        map.put("%2F", "/");
+        map.put("%3A", ":");
+        map.put("%3B", ";");
+        map.put("%5C", "\\");
+        map.put("%7C", "|");
+        SAFE_REPLACEMENTS = Collections.unmodifiableMap(map);
+    }
 
     private final TestableProcessFactory processFactory;
     private Provider provider;
@@ -234,10 +253,29 @@ public class UserAgentImpl implements UserAgent {
         Arrays.sort(keyArray);
         for (final String key : keyArray) {
             final String value = (String) pairs.get(key);
-            // TODO: encode value (i.e. line.separator is '\n', plus there could be diacritics)
-            destination.append(key).append('=').append(value).append(NEW_LINE);
+            final String encodedKey;
+            final String encodedValue;
+            encodedKey = sortOfUrlEncode(key);
+            encodedValue = sortOfUrlEncode(value);
+            destination.append(encodedKey).append('=').append(encodedValue).append(NEW_LINE);
         }
         destination.append(NEW_LINE).append(footer).append(NEW_LINE);
+    }
+
+    static String sortOfUrlEncode(final String s) {
+        try {
+            //noinspection UnnecessaryLocalVariable
+            final String encoded = URLEncoder.encode(s, UTF_8);
+            // encode() goes too far for our purposes, so undo some common ones for easier raw inspection
+            String result = encoded;
+            for (final Map.Entry<String, String> entry : SAFE_REPLACEMENTS.entrySet()) {
+                result = result.replace(entry.getKey(), entry.getValue());
+            }
+            return result;
+        }
+        catch (final UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
     }
 
     static void decode(final UserAgent target, final String[] args, final InputStream inputStream, final OutputStream outputStream) {
