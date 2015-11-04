@@ -31,14 +31,41 @@ public abstract class Provider {
         return className;
     }
 
+    /**
+     * Compares the specified string against a known value for the Mac OS X operating system.
+     *
+     * @param osName a string representation of the operating system name,
+     *               usually obtained from the {@code os.name} system property.
+     *
+     * @return {@code true} if the specified string represents the Mac OS X operating system;
+     *          {@code false} otherwise
+     */
     public static boolean isMac(final String osName) {
         return osName.equals("Mac OS X");
     }
 
+    /**
+     * Compares the specified string against a known value for the GNU/Linux family of operating systems.
+     *
+     * @param osName a string representation of the operating system name,
+     *               usually obtained from the {@code os.name} system property.
+     *
+     * @return {@code true} if the specified string represents a GNU/Linux-based operating system;
+     *          {@code false} otherwise
+     */
     public static boolean isLinux(final String osName) {
         return osName.equals("Linux");
     }
 
+    /**
+     * Compares the specified string against a known value for the Windows family of operating systems.
+     *
+     * @param osName a string representation of the operating system name,
+     *               usually obtained from the {@code os.name} system property.
+     *
+     * @return {@code true} if the specified string represents a Windows operating system;
+     *          {@code false} otherwise
+     */
     public static boolean isWindows(final String osName) {
         return osName.startsWith("Windows");
     }
