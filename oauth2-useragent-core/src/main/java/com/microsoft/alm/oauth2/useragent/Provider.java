@@ -31,15 +31,15 @@ public abstract class Provider {
         return className;
     }
 
-    static boolean isMac(final String osName) {
+    public static boolean isMac(final String osName) {
         return osName.equals("Mac OS X");
     }
 
-    static boolean isLinux(final String osName) {
+    public static boolean isLinux(final String osName) {
         return osName.equals("Linux");
     }
 
-    static boolean isWindows(final String osName) {
+    public static boolean isWindows(final String osName) {
         return osName.startsWith("Windows");
     }
 
