@@ -4,6 +4,7 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import com.microsoft.alm.oauth2.useragent.subprocess.DefaultProcessFactory;
+import com.microsoft.alm.oauth2.useragent.subprocess.StreamConsumer;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
 
@@ -68,46 +69,6 @@ public class UserAgentImpl implements UserAgent {
     public AuthorizationResponse requestAuthorizationCode(final URI authorizationEndpoint, final URI redirectUri)
             throws AuthorizationException {
         return encode(REQUEST_AUTHORIZATION_CODE, authorizationEndpoint.toString(), redirectUri.toString());
-    }
-
-    class StreamConsumer implements Runnable {
-
-        private final InputStream source;
-        private final StringBuilder contents;
-
-        public StreamConsumer(final InputStream source) {
-            if (source == null)
-                throw new IllegalArgumentException("The 'source' argument is null.");
-
-            this.source = source;
-            this.contents = new StringBuilder();
-        }
-
-        @Override
-        public String toString() {
-            return contents.toString();
-        }
-
-        @Override
-        public void run() {
-            try {
-                final InputStreamReader inputStreamReader = new InputStreamReader(source);
-                final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    contents.append(line).append(NEW_LINE);
-                }
-            }
-            catch (final IOException ignored) {
-            }
-            finally {
-                try {
-                    source.close();
-                }
-                catch (final IOException ignored) {
-                }
-            }
-        }
     }
 
     AuthorizationResponse encode(final String methodName, final String... parameters)
