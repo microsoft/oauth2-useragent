@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class StreamConsumer implements Runnable {
+class StreamConsumer implements Runnable {
 
     static final String NEW_LINE = System.getProperty("line.separator");
 

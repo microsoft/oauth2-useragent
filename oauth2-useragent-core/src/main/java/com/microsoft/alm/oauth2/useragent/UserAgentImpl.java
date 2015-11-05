@@ -5,7 +5,6 @@ package com.microsoft.alm.oauth2.useragent;
 
 import com.microsoft.alm.oauth2.useragent.subprocess.DefaultProcessFactory;
 import com.microsoft.alm.oauth2.useragent.subprocess.ProcessCoordinator;
-import com.microsoft.alm.oauth2.useragent.subprocess.StreamConsumer;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
 
