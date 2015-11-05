@@ -32,7 +32,7 @@ class JavaFxProvider extends Provider {
 
     static ArrayList<String> checkRequirements(final String javaRuntimeVersion, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
         final ArrayList<String> requirements = new ArrayList<String>(REQUIREMENTS);
-        final Version version = new Version(javaRuntimeVersion);
+        final Version version = Version.parseJavaRuntimeVersion(javaRuntimeVersion);
         boolean hasSupportedJava = false;
         // TODO: what about 1.9 or 2.x?
         switch (version.getMajor()) {
