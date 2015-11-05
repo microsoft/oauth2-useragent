@@ -3,6 +3,11 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.subprocess.DefaultProcessFactory;
+import com.microsoft.alm.oauth2.useragent.subprocess.ProcessCoordinator;
+import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
+import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -66,46 +71,6 @@ public class UserAgentImpl implements UserAgent {
         return encode(REQUEST_AUTHORIZATION_CODE, authorizationEndpoint.toString(), redirectUri.toString());
     }
 
-    class StreamConsumer implements Runnable {
-
-        private final InputStream source;
-        private final StringBuilder contents;
-
-        public StreamConsumer(final InputStream source) {
-            if (source == null)
-                throw new IllegalArgumentException("The 'source' argument is null.");
-
-            this.source = source;
-            this.contents = new StringBuilder();
-        }
-
-        @Override
-        public String toString() {
-            return contents.toString();
-        }
-
-        @Override
-        public void run() {
-            try {
-                final InputStreamReader inputStreamReader = new InputStreamReader(source);
-                final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    contents.append(line).append(NEW_LINE);
-                }
-            }
-            catch (final IOException ignored) {
-            }
-            finally {
-                try {
-                    source.close();
-                }
-                catch (final IOException ignored) {
-                }
-            }
-        }
-    }
-
     AuthorizationResponse encode(final String methodName, final String... parameters)
             throws AuthorizationException {
         final ArrayList<String> command = new ArrayList<String>();
@@ -126,30 +91,17 @@ public class UserAgentImpl implements UserAgent {
         final String[] args = command.toArray(EMPTY_STRING_ARRAY);
         try {
             final TestableProcess process = processFactory.create(args);
-            final OutputStream outputStream = process.getOutputStream();
-            final PrintStream printStream = new PrintStream(outputStream);
+            final ProcessCoordinator coordinator = new ProcessCoordinator(process);
             for (final String parameter : parameters) {
-                printStream.println(parameter);
+                coordinator.println(parameter);
             }
-            printStream.flush();
+            coordinator.waitFor();
 
-            final StreamConsumer stdOut = new StreamConsumer(process.getInputStream());
-            final Thread stdOutThread = new Thread(stdOut);
-            final StreamConsumer stdErr = new StreamConsumer(process.getErrorStream());
-            final Thread stdErrThread = new Thread(stdErr);
-
-            stdOutThread.start();
-            stdErrThread.start();
-
-            stdOutThread.join();
-            stdErrThread.join();
-            process.waitFor();
-
-            final String errorContents = stdErr.toString();
+            final String errorContents = coordinator.getStdErr();
             if (errorContents.length() > 0) {
                 throw new AuthorizationException("subprocess_error", errorContents, null, null);
             }
-            final String response = stdOut.toString();
+            final String response = coordinator.getStdOut();
             return AuthorizationResponse.fromString(response);
         }
         catch (final IOException e) {

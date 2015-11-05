@@ -3,6 +3,8 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
