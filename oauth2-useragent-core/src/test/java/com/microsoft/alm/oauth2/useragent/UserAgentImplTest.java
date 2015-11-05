@@ -3,6 +3,8 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
+import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
