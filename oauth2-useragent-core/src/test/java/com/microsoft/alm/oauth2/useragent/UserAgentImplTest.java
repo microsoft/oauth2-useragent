@@ -67,7 +67,7 @@ public class UserAgentImplTest {
         final String redirectUri = "https://redirect.example.com";
         final TestProcess process = new TestProcess("code=red");
         final TestableProcessFactory processFactory = new TestableProcessFactory() {
-            @Override public TestableProcess create(final String... args) throws IOException {
+            @Override public TestableProcess create(final String... command) throws IOException {
                 return process;
             }
         };
@@ -87,7 +87,7 @@ public class UserAgentImplTest {
         final String stackTrace = "Exception in Application start method";
         final TestProcess process = new TestProcess("", stackTrace);
         final TestableProcessFactory processFactory = new TestableProcessFactory() {
-            @Override public TestableProcess create(final String... args) throws IOException {
+            @Override public TestableProcess create(final String... command) throws IOException {
                 return process;
             }
         };

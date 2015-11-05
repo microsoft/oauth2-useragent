@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class DefaultProcessFactory implements TestableProcessFactory {
     @Override
-    public TestableProcess create(final String... args) throws IOException {
-        final ProcessBuilder processBuilder = new ProcessBuilder(args);
+    public TestableProcess create(final String... command) throws IOException {
+        final ProcessBuilder processBuilder = new ProcessBuilder(command);
         final DefaultProcess testableProcess = new DefaultProcess(processBuilder.start());
         return testableProcess;
     }
