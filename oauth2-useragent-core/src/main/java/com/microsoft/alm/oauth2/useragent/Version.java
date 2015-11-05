@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class Version {
     private final static Pattern JAVA_RUNTIME_VERSION =
-            Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)-b(\\d+).*");
+            Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)-(?:.*-)b(\\d+).*");
     private final int major;
     private final int minor;
     private final int patch;

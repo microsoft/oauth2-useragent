@@ -12,6 +12,10 @@ public class VersionTest {
         test(1, 7, 0, 79, 14, "1.7.0_79-b14");
     }
 
+    @Test public void openJdk7InternalOnUbuntu() {
+        test(1, 7, 0, 79, 14, "1.7.0_79-internal-b14");
+    }
+
     @Test public void appleJdk6OnMacOsX() {
         test(1, 6, 0, 65, 14, "1.6.0_65-b14-466.1-11M4716");
     }
