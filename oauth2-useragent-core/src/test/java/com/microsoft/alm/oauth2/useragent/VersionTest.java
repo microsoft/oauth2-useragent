@@ -41,11 +41,20 @@ public class VersionTest
         testJdkParsing(1, 8, 0, 60, 27, "1.8.0_60-b27");
     }
 
-    @Test public void genericVersion() {
-        final Version version = Version.parseVersion("git version 2.4.9 (Apple Git-60)");
-        Assert.assertEquals(2, version.getMajor());
-        Assert.assertEquals(4, version.getMinor());
-        Assert.assertEquals(9, version.getPatch());
+    @Test public void gitVersion()
+    {
+        testGenericVersion(2, 4, 9, "git version 2.4.9 (Apple Git-60)");
+    }
+
+    @Test public void macOsVersion() {
+        testGenericVersion(10, 10, 5, "10.10.5");
+    }
+
+    private void testGenericVersion(final int major, final int minor, final int patch, final String input) {
+        final Version version = Version.parseVersion(input);
+        Assert.assertEquals(major, version.getMajor());
+        Assert.assertEquals(minor, version.getMinor());
+        Assert.assertEquals(patch, version.getPatch());
     }
 
     private void testJdkParsing(final int major, final int minor, final int patch, final int update, final int build, final String input) {
