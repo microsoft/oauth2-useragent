@@ -11,7 +11,7 @@ public class Version
     private final static Pattern JAVA_RUNTIME_VERSION =
             Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)-(?:.*-)?b(\\d+).*");
     private final static Pattern GENERIC_VERSION =
-            Pattern.compile(".*(\\d+)\\.(\\d+)\\.(\\d+).*");
+            Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)\\.(\\d+).*");
     private final int major;
     private final int minor;
     private final int patch;
