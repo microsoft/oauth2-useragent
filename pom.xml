@@ -8,7 +8,7 @@
 
   <groupId>com.microsoft.alm</groupId>
   <artifactId>oauth2-useragent-parent</artifactId>
-  <version>0.5.1</version>
+  <version>0.5.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Parent for Microsoft OAuth 2.0 User Agent library for Java</name>
@@ -34,7 +34,7 @@
     <connection>scm:git:https://mseng.visualstudio.com/DefaultCollection/VSOnline/_git/Java.oauth2-useragent</connection>
     <developerConnection>scm:git:https://mseng.visualstudio.com/DefaultCollection/VSOnline/_git/Java.oauth2-useragent</developerConnection>
     <url>https://mseng.visualstudio.com/DefaultCollection/VSOnline/_git/Java.oauth2-useragent</url>
-    <tag>oauth2-useragent-0.5.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
