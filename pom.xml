@@ -49,6 +49,12 @@
   </distributionManagement>
 
   <properties>
+    <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
+    ...but we don't want to use the maven-source-plugin so we simply tell it to not attach its outputs
+    by setting the 'attach' property.
+     https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
+     -->
+    <attach>false</attach>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
