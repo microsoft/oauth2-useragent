@@ -1,14 +1,15 @@
 Contributing
 ============
 There are many ways to contribute.
-* [Report defects and provide suggestions](https://github.com/oauth2-useragent/issues).
-* Review [pull requests](https://github.com/Microsoft/oauth2-useragent/pulls), even if it's just to verify that the defect was fixed or that the feature was implemented as intended.
-* Contribute fixes and features:
-  1. Fork this repository ( https://github.com/Microsoft/oauth2-useragent/fork ) and clone it.
-  2. Create a feature branch (`git checkout -b my-new-feature`).
-  3. Make small commits as you go along (`git commit -am 'Add helper method with test'`).
-  4. Push your feature branch to your fork (`git push origin my-new-feature`),
-  5. Create a new Pull Request ( https://github.com/Microsoft/oauth2-useragent/pulls ).
+
+1. [Report defects and provide suggestions](https://github.com/oauth2-useragent/issues).
+2. Review [pull requests](https://github.com/Microsoft/oauth2-useragent/pulls), even if it's just to verify that the defect was fixed or that the feature was implemented as intended.
+3. Contribute fixes and features:
+    1. Fork this repository ( https://github.com/Microsoft/oauth2-useragent/fork ) and clone it.
+    2. Create a feature branch (`git checkout -b my-new-feature`).
+    3. Make small commits as you go along (`git commit -am 'Add helper method with test'`).
+    4. Push your feature branch to your fork (`git push origin my-new-feature`),
+    5. Create a new Pull Request ( https://github.com/Microsoft/oauth2-useragent/pulls ).
 
 For source code contributions, you will need to complete a **Contributor License Agreement (CLA)**. Briefly, this agreement testifies that you grant us permission to use the submitted change according to the terms of the project's license, and that the work being submitted is under the appropriate copyright.
 

@@ -25,7 +25,14 @@
         <filtering>true</filtering>
         <includes>
           <include>License.txt</include>
-          <include>ReadMe.html</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/..</directory>
+        <targetPath>${project.build.directory}</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>*.md</include>
         </includes>
       </resource>
       <!-- The following are implicit dependencies bundled in our JAR,
@@ -62,6 +69,25 @@
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <goals>deploy</goals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.ruleoftech</groupId>
+        <artifactId>markdown-page-generator-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <inputDirectory>${project.build.directory}</inputDirectory>
+          <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+          <pegdownExtensions>AUTOLINKS,FENCED_CODE_BLOCKS</pegdownExtensions>
+          <headerHtmlFile>${project.basedir}/src/main/resources/markdown/html/header.html</headerHtmlFile>
+          <footerHtmlFile>${project.basedir}/src/main/resources/markdown/html/footer.html</footerHtmlFile>
         </configuration>
       </plugin>
     </plugins>

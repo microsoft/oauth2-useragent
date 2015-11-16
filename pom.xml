@@ -162,6 +162,11 @@
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.6</version>
         </plugin>
+        <plugin>
+          <groupId>com.ruleoftech</groupId>
+          <artifactId>markdown-page-generator-plugin</artifactId>
+          <version>0.9</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
