@@ -12,7 +12,7 @@ How to use
 ----------
 Maven is the preferred way of referencing this library.  Add the following to your POM:
 
-```
+```xml
   <dependency>
     <groupId>${project.groupId}</groupId>
     <artifactId>${project.artifactId}</artifactId>
@@ -22,7 +22,7 @@ Maven is the preferred way of referencing this library.  Add the following to yo
 
 ...and then you can write code like:
 
-```
+```java
 public class App {
   public static void main(final String[] args) throws AuthorizationException, URISyntaxException {
 
