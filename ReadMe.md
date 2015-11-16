@@ -41,5 +41,5 @@ public class App {
 <ol type="A">
   <li>a browser window (also known as "user-agent") will be opened and directed to the authorization endpoint URI</li>
   <li>the user can then authenticate and decide whether to authorize the client's request</li>
-  <li>the authorization server will send the browser to the redirect URI with either an authorization code or an error code, which will manifest itself as returning an instance of `AuthorizationResponse` or throwing an `AuthorizationException`, respectively</li>
+  <li>the authorization server will send the browser to the redirect URI with either an authorization code or an error code, which will manifest itself as returning an instance of <tt>AuthorizationResponse</tt> or throwing an <tt>AuthorizationException</tt>, respectively</li>
 </ol>
