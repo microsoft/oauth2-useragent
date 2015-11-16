@@ -10,10 +10,12 @@ The MIT license can be found in [License.txt](License.txt)
 
 What this library provides
 --------------------------
-The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authorization Code Flow" (see section 4.1 and Figure 3 in RFC 6749), which is to say:
+There is a `UserAgentImpl` class (which is mockable via the `UserAgent` interface it implements).
+
+The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authorization Code Flow" (see Figure 3 in [section 4.1 of RFC 6749](http://tools.ietf.org/html/rfc6749#section-4.1)), which is to say:
 <ol type="A">
   <li>a browser window (also known as "user-agent") will be opened and directed to the authorization endpoint URI</li>
-  <li>the user can then authenticate and decide whether to authorize the client's request</li>
+  <li>the user (also known as "resource owner") can then authenticate and decide whether to authorize the client's request</li>
   <li>the authorization server will send the browser to the redirect URI with either an authorization code or an error code, which will manifest itself as returning an instance of <tt>AuthorizationResponse</tt> or throwing an <tt>AuthorizationException</tt>, respectively</li>
 </ol>
 
