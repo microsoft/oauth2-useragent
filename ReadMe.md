@@ -8,6 +8,16 @@ License
 The MIT license can be found in [License.txt](License.txt)
 
 
+What this library provides
+--------------------------
+The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authorization Code Flow" (see section 4.1 and Figure 3 in RFC 6749), which is to say:
+<ol type="A">
+  <li>a browser window (also known as "user-agent") will be opened and directed to the authorization endpoint URI</li>
+  <li>the user can then authenticate and decide whether to authorize the client's request</li>
+  <li>the authorization server will send the browser to the redirect URI with either an authorization code or an error code, which will manifest itself as returning an instance of <tt>AuthorizationResponse</tt> or throwing an <tt>AuthorizationException</tt>, respectively</li>
+</ol>
+
+
 How to use
 ----------
 Maven is the preferred way of referencing this library.  Add the following to your POM:
@@ -39,9 +49,4 @@ public class App {
 }
 ```
 
-...the resulting program accepts an OAuth 2.0 authorization endpoint URI and a redirect URI to watch for as command-line arguments.  The `requestAuthorizationCode` method will then perform steps (A)-(C) of the "Authorization Code Flow" (see section 4.1 and Figure 3 in RFC 6749), which is to say:
-<ol type="A">
-  <li>a browser window (also known as "user-agent") will be opened and directed to the authorization endpoint URI</li>
-  <li>the user can then authenticate and decide whether to authorize the client's request</li>
-  <li>the authorization server will send the browser to the redirect URI with either an authorization code or an error code, which will manifest itself as returning an instance of <tt>AuthorizationResponse</tt> or throwing an <tt>AuthorizationException</tt>, respectively</li>
-</ol>
+...the resulting program accepts an OAuth 2.0 authorization endpoint URI and a redirect URI to watch for as command-line arguments, then launches a web browser to perform the "Authorization Code Flow" described above.  
