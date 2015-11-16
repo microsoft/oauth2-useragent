@@ -25,7 +25,14 @@
         <filtering>true</filtering>
         <includes>
           <include>License.txt</include>
-          <include>ReadMe.html</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/..</directory>
+        <targetPath>${project.build.directory}</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>*.md</include>
         </includes>
       </resource>
       <!-- The following are implicit dependencies bundled in our JAR,
@@ -64,6 +71,25 @@
           <goals>deploy</goals>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.ruleoftech</groupId>
+        <artifactId>markdown-page-generator-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <inputDirectory>${project.build.directory}</inputDirectory>
+          <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+          <pegdownExtensions>AUTOLINKS,FENCED_CODE_BLOCKS</pegdownExtensions>
+          <headerHtmlFile>${project.basedir}/src/main/resources/markdown/html/header.html</headerHtmlFile>
+          <footerHtmlFile>${project.basedir}/src/main/resources/markdown/html/footer.html</footerHtmlFile>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -72,17 +98,21 @@
       <id>release</id>
       <build>
         <plugins>
-          <!-- TODO: the sources JAR is currently broken -->
           <plugin>
-            <artifactId>maven-source-plugin</artifactId>
+            <artifactId>maven-assembly-plugin</artifactId>
             <executions>
               <execution>
-                <id>attach-sources</id>
+                <phase>package</phase>
                 <goals>
-                  <goal>jar</goal>
+                  <goal>single</goal>
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assembly/sources.xml</descriptor>
+              </descriptors>
+            </configuration>
           </plugin>
           <plugin>
             <artifactId>maven-gpg-plugin</artifactId>

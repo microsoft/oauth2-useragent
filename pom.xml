@@ -154,13 +154,18 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.6</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.6</version>
+        </plugin>
+        <plugin>
+          <groupId>com.ruleoftech</groupId>
+          <artifactId>markdown-page-generator-plugin</artifactId>
+          <version>0.9</version>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright (c) Microsoft. All rights reserved.
+  ~ Licensed under the MIT license. See License.txt in the project root.
+  -->
+
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+  <id>sources</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <excludes>
+        <exclude>com.microsoft.alm:oauth2-useragent</exclude>
+        <exclude>com.microsoft.alm:oauth2-useragent-tester</exclude>
+      </excludes>
+      <!-- Enable access to all projects in the current multi-module build! -->
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <sources>
+        <includeModuleDirectory>false</includeModuleDirectory>
+        <fileSets>
+          <fileSet>
+            <outputDirectory>.</outputDirectory>
+            <directory>src/main/java</directory>
+          </fileSet>
+        </fileSets>
+      </sources>
+    </moduleSet>
+  </moduleSets>
+</assembly>
