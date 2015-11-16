@@ -4,7 +4,7 @@ ${project.description}
 
 License
 -------
-The MIT license can be found in (License.txt)
+The MIT license can be found in [License.txt](License.txt)
 
 How to use
 ----------
