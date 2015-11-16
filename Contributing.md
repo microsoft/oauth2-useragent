@@ -2,7 +2,7 @@ Contributing
 ============
 There are many ways to contribute.
 
-1. [Report defects and provide suggestions](https://github.com/oauth2-useragent/issues).
+1. [Report defects and provide suggestions](https://github.com/Microsoft/oauth2-useragent/issues).
 2. Review [pull requests](https://github.com/Microsoft/oauth2-useragent/pulls), even if it's just to verify that the defect was fixed or that the feature was implemented as intended.
 3. Contribute fixes and features:
     1. Fork this repository ( https://github.com/Microsoft/oauth2-useragent/fork ) and clone it.
