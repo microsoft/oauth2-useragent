@@ -20,6 +20,17 @@ The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authori
 </ol>
 
 
+Why would I want to use this library?
+-------------------------------------
+If you are writing an interactive desktop Java application (also known as "client") that needs to connect to a remote resource protected with OAuth 2.0, then this library is for you.  A pop-up window hosting a user agent (web browser) will be presented to the resource owner (user) when they need to authenticate to the remote resource and authorize access to the client.  The library monitors the web browser to detect when it tries to visit the redirect URL and intercepts the request to complete the process and close the window.
+
+The web browser monitoring feature avoids
+1. having to register a redirect URI that points to the local machine (which is sometimes impossible) and
+2. hosting a web server on the local machine that would listen for a connection from the web browser.
+
+If you are writing a web-based Java application or an Android app that needs to connect to a remote resource protected with OAuth 2.0, this library won't help you.  Consider using something like the [Google OAuth Client Library for Java](https://github.com/google/google-oauth-java-client).
+
+
 How to use
 ----------
 Maven is the preferred way of referencing this library.  Add the following to your POM:
