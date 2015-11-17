@@ -51,4 +51,28 @@ public class App {
 }
 ```
 
-...the resulting program accepts an OAuth 2.0 authorization endpoint URI and a redirect URI to watch for as command-line arguments, then launches a web browser to perform the "Authorization Code Flow" described above.  
+...the resulting program accepts an OAuth 2.0 authorization endpoint URI and a redirect URI to watch for as command-line arguments, then launches a web browser to perform the "Authorization Code Flow" described above.
+
+
+How to build
+------------
+If you would like to recompile this library, it's relatively easy.
+
+### System requirements
+You will need the following software in your PATH:
+
+1. Oracle JDK 8.
+    * Version 8 of the Oracle Java Development Kit is required because of the dependency on JavaFX.  You *might* be able to build using OpenJDK with OpenJFX.
+2. Maven 3.2+
+
+### Run a quick build with Maven
+
+1. Open a command prompt or terminal window.
+2. Run `mvn clean verify`
+    * This will download any Maven plugins you might be missing, compile the code, run some unit tests, and package up the JARs.
+
+### Run a more comprehensive build with Maven
+Like the "quick build", plus some integration tests will be run, whereby a browser will pop up momentarily a few times.
+
+1. Open a command prompt or terminal window.
+2. Run `mvn clean verify -Dintegration_tests=true`
