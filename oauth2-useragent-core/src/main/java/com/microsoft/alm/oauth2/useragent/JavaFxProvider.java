@@ -69,6 +69,10 @@ class JavaFxProvider extends Provider {
             // TODO: There's still a chance the user is connected via SSH or on Server Core...
             hasDesktop = true;
         }
+        else if (isMac(osName)) {
+            // TODO: There's still a chance the user is connected via SSH...
+            hasDesktop = true;
+        }
         else if (isLinux(osName)) {
             if (displayVariable != null) {
                 hasDesktop = true;
