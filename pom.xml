@@ -49,12 +49,6 @@
   </distributionManagement>
 
   <properties>
-    <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
-    ...but we don't want to use the maven-source-plugin so we simply tell it to not attach its outputs
-    by setting the 'attach' property.
-     https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
-     -->
-    <attach>false</attach>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -209,6 +203,28 @@
           </checkstyleRules>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <logViolationsToConsole>true</logViolationsToConsole>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- The maven-javadoc-plugin is activated during release, through the use of `-D performRelease=true`
+        ...but we don't want to use the maven-javadoc-plugin so we simply tell it to not attach its outputs
+        by setting the 'attach' parameter.
+         https://maven.apache.org/plugins/maven-javadoc-plugin/jar-mojo.html
+         -->
+        <configuration>
+          <attach>false</attach>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
+        ...but we don't want to use the maven-source-plugin so we simply tell it to not attach its outputs
+        by setting the 'attach' parameter.
+         https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
+         -->
+        <configuration>
+          <attach>false</attach>
         </configuration>
       </plugin>
       <plugin>
