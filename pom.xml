@@ -213,17 +213,17 @@
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
-         so disable deployment by default (here) and only enable it for the aggregator -->
+         and the parent POM, so enable deployment here -->
         <configuration>
-          <skip>true</skip>
+          <skip>false</skip>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-install-plugin</artifactId>
         <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
-         so disable installation by default (here) and only enable it for the aggregator -->
+         and the parent POM, so enable installation here -->
         <configuration>
-          <skip>true</skip>
+          <skip>false</skip>
         </configuration>
       </plugin>
       <plugin>
