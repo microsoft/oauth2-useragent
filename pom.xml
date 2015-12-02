@@ -229,23 +229,21 @@
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <!-- The maven-javadoc-plugin is activated during release, through the use of `-D performRelease=true`
-        ...but we don't want to use the maven-javadoc-plugin so we simply tell it to not attach its outputs
-        by setting the 'attach' parameter.
+        ...but we don't want to use the maven-javadoc-plugin so we disable it altogether here.
          https://maven.apache.org/plugins/maven-javadoc-plugin/jar-mojo.html
          -->
         <configuration>
-          <attach>false</attach>
+          <skip>true</skip>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
-        ...but we don't want to use the maven-source-plugin so we simply tell it to not attach its outputs
-        by setting the 'attach' parameter.
+        ...but we don't want to use the maven-source-plugin so we disable it altogether.
          https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
          -->
         <configuration>
-          <attach>false</attach>
+          <skipSource>true</skipSource>
         </configuration>
       </plugin>
       <plugin>

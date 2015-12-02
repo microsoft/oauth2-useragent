@@ -134,6 +134,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <attach>true</attach>
+              <skip>false</skip>
               <sourcepath>${project.basedir}/../oauth2-useragent-core/src/main/java;${project.basedir}/../oauth2-useragent-javafx/src/main/java</sourcepath>
             </configuration>
           </plugin>
