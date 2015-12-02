@@ -115,6 +115,13 @@
             </configuration>
           </plugin>
           <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <attach>true</attach>
+              <sourcepath>${project.basedir}/../oauth2-useragent-core/src/main/java;${project.basedir}/../oauth2-useragent-javafx/src/main/java</sourcepath>
+            </configuration>
+          </plugin>
+          <plugin>
             <artifactId>maven-gpg-plugin</artifactId>
             <executions>
               <execution>
