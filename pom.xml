@@ -177,6 +177,11 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.7</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -203,6 +208,22 @@
           </checkstyleRules>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <logViolationsToConsole>true</logViolationsToConsole>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         so disable deployment by default (here) and only enable it for the aggregator -->
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         so disable installation by default (here) and only enable it for the aggregator -->
+        <configuration>
+          <skip>true</skip>
         </configuration>
       </plugin>
       <plugin>
