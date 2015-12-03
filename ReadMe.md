@@ -31,6 +31,11 @@ The web browser monitoring feature avoids
 If you are writing a web-based Java application or an Android app that needs to connect to a remote resource protected with OAuth 2.0, this library won't help you.  Consider using something like the [Google OAuth Client Library for Java](https://github.com/google/google-oauth-java-client).
 
 
+Why not use `java.awt.Desktop.browse(URI)`?
+-------------------------------------------
+The tradeoffs associated with launching the default [external] browser with a URI entail not having to worry about detecting, shipping and/or hosting a web browser but with the difficulty that external browsers have no built-in, direct way to communicate with other processes.  The trick that is often used in OAuth 2.0 scenarios is to get the authorization server to redirect to an address that points to the local computer, which brings about its own set of challenges.
+
+
 How to use
 ----------
 Maven is the preferred way of referencing this library.  Add the following to your POM:
@@ -87,3 +92,8 @@ Like the "quick build", plus some integration tests will be run, whereby a brows
 
 1. Open a command prompt or terminal window.
 2. Run `mvn clean verify -Dintegration_tests=true`
+
+
+How can I contribute?
+---------------------
+Please refer to [Contributing.md](Contributing.md).
