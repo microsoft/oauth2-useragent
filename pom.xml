@@ -49,12 +49,6 @@
   </distributionManagement>
 
   <properties>
-    <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
-    ...but we don't want to use the maven-source-plugin so we simply tell it to not attach its outputs
-    by setting the 'attach' property.
-     https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
-     -->
-    <attach>false</attach>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -183,6 +177,11 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.7</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -209,6 +208,42 @@
           </checkstyleRules>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <logViolationsToConsole>true</logViolationsToConsole>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so enable deployment here -->
+        <configuration>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so enable installation here -->
+        <configuration>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- The maven-javadoc-plugin is activated during release, through the use of `-D performRelease=true`
+        ...but we don't want to use the maven-javadoc-plugin so we disable it altogether here.
+         https://maven.apache.org/plugins/maven-javadoc-plugin/jar-mojo.html
+         -->
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <!-- The maven-source-plugin is activated during release, through the use of `-D performRelease=true`
+        ...but we don't want to use the maven-source-plugin so we disable it altogether.
+         https://maven.apache.org/plugins/maven-source-plugin/jar-mojo.html
+         -->
+        <configuration>
+          <skipSource>true</skipSource>
         </configuration>
       </plugin>
       <plugin>

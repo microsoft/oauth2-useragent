@@ -64,6 +64,22 @@
         </executions>
       </plugin>
       <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so disable deployment here -->
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so disable installation here -->
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
@@ -72,20 +88,6 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <additionalparam>-quiet</additionalparam>
         </configuration>
       </plugin>
     </plugins>

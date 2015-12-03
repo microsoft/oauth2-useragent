@@ -55,6 +55,22 @@
 
     <plugins>
       <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so enable deployment here -->
+        <configuration>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+         and the parent POM, so enable installation here -->
+        <configuration>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
@@ -112,6 +128,15 @@
               <descriptors>
                 <descriptor>src/assembly/sources.xml</descriptor>
               </descriptors>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-quiet</additionalparam>
+              <attach>true</attach>
+              <skip>false</skip>
+              <sourcepath>${project.basedir}/../oauth2-useragent-core/src/main/java;${project.basedir}/../oauth2-useragent-javafx/src/main/java</sourcepath>
             </configuration>
           </plugin>
           <plugin>
