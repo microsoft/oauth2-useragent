@@ -12,6 +12,7 @@
   <packaging>pom</packaging>
 
   <name>Parent for Microsoft OAuth 2.0 User Agent library for Java</name>
+  <description>This POM exists only to support the multi-module oauth2-useragent project and contains project metadata common to all modules.</description>
   <url>https://www.visualstudio.com/downloads/download-visual-studio-vs</url>
 
   <licenses>
