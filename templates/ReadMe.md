@@ -92,3 +92,8 @@ Like the "quick build", plus some integration tests will be run, whereby a brows
 
 1. Open a command prompt or terminal window.
 2. Run `mvn clean verify -Dintegration_tests=true`
+
+
+How can I contribute?
+---------------------
+Please refer to [Contributing.md](Contributing.md).
