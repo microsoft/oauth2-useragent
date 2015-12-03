@@ -30,9 +30,18 @@
       <resource>
         <directory>${project.basedir}/..</directory>
         <targetPath>${project.build.directory}</targetPath>
-        <filtering>true</filtering>
+        <filtering>false</filtering>
         <includes>
           <include>*.md</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/../templates</directory>
+        <targetPath>${project.build.directory}</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <!-- Templates: Every file here must be matched under the release profile -->
+          <include>ReadMe.md</include>
         </includes>
       </resource>
       <!-- The following are implicit dependencies bundled in our JAR,
@@ -152,6 +161,17 @@
             </executions>
           </plugin>
         </plugins>
+        <resources>
+          <resource>
+            <directory>${project.build.directory}</directory>
+            <targetPath>${project.basedir}/..</targetPath>
+            <filtering>false</filtering>
+            <includes>
+              <!-- Every file here must be matched under Templates -->
+              <include>ReadMe.md</include>
+            </includes>
+          </resource>
+        </resources>
       </build>
     </profile>
   </profiles>
