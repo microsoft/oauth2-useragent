@@ -1,6 +1,8 @@
 ---
 language: java
-script: mvn clean verify
+# http://stackoverflow.com/questions/14694139/how-to-resolve-dependencies-between-modules-within-multi-module-project
+install: mvn compile dependency:go-offline --batch-mode --show-version
+script: mvn clean verify --offline
 # https://docs.travis-ci.com/user/migrating-from-legacy/
 sudo: false
 jdk:
