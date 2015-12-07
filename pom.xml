@@ -59,6 +59,8 @@
     <!-- The following module MUST go after core and the providers -->
     <module>oauth2-useragent</module>
     <module>oauth2-useragent-tester</module>
+    <!-- This module MUST be last! -->
+    <module>oauth2-useragent-dummy</module>
   </modules>
 
   <dependencyManagement>

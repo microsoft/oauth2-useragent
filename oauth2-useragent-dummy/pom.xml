@@ -1,0 +1,31 @@
+<!--
+  ~ Copyright (c) Microsoft. All rights reserved.
+  ~ Licensed under the MIT license. See License.txt in the project root.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.microsoft.alm</groupId>
+    <artifactId>oauth2-useragent-parent</artifactId>
+    <version>0.5.8-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>oauth2-useragent-dummy</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Dummy module to allow the Nexus Staging Deploy Mojo to trigger</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <configuration>
+          <!-- This is the last module, to make sure the Nexus Staging plugin plugin can upload the files. -->
+          <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
