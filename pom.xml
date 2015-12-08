@@ -196,15 +196,20 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
+        <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
+           and the parent POM, so enable deployment here -->
+          <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
-          <goals>deploy nexus-staging:release</goals>
+          <goals>deploy</goals>
         </configuration>
       </plugin>
       <plugin>
@@ -230,14 +235,6 @@
           </checkstyleRules>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <logViolationsToConsole>true</logViolationsToConsole>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
-         and the parent POM, so enable deployment here -->
-        <configuration>
-          <skip>false</skip>
         </configuration>
       </plugin>
       <plugin>

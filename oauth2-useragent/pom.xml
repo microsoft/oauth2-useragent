@@ -64,11 +64,12 @@
 
     <plugins>
       <plugin>
-        <artifactId>maven-deploy-plugin</artifactId>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
         <!-- The only artifacts we need are from the aggregator project, oauth2-useragent,
          and the parent POM, so enable deployment here -->
         <configuration>
-          <skip>false</skip>
+          <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         </configuration>
       </plugin>
       <plugin>
