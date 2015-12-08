@@ -8,6 +8,12 @@ License
 The MIT license can be found in [License.txt](License.txt)
 
 
+Build status
+------------
+This project has continuous integration hosted by Travis CI:
+[![Build Status](https://travis-ci.org/Microsoft/oauth2-useragent.svg?branch=master)](https://travis-ci.org/Microsoft/oauth2-useragent)
+
+
 What this library provides
 --------------------------
 There is a `UserAgentImpl` class (which is mockable via the `UserAgent` interface it implements).
