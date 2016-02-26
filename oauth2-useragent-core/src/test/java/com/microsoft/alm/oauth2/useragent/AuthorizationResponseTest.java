@@ -70,4 +70,18 @@ public class AuthorizationResponseTest {
         Assert.fail("Exception should have been thrown by fromString()");
     }
 
+    @Test public void fromString_erroneousNameValuePair() throws Exception {
+        final String input = "codered&stategreen";
+
+        try {
+            AuthorizationResponse.fromString(input);
+        } catch (final AuthorizationException actual) {
+            Assert.assertEquals("parsing_error", actual.getCode());
+            // no need to assert a hardcoded error description string
+            return;
+        }
+
+        Assert.fail("Exception should have been thrown by fromString()");
+    }
+
 }
