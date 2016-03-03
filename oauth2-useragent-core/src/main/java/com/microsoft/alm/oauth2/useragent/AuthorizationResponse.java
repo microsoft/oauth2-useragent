@@ -50,12 +50,16 @@ public class AuthorizationResponse {
     }
 
     public static AuthorizationResponse fromString(final String s) throws AuthorizationException {
+        return fromString(s, null);
+    }
+
+    public static AuthorizationResponse fromString(final String s, final String potentialDescription) throws AuthorizationException {
         String code = null;
         String state = null;
         String error = "unknown_error";
-        String errorDescription = null;
+        String errorDescription = potentialDescription;
         String errorUriString = null;
-        if (s != null) {
+        if (s != null && s.length() > 0) {
             final String[] pairs = PAIR_SEPARATOR.split(s.trim());
 
             for (final String pair : pairs) {
