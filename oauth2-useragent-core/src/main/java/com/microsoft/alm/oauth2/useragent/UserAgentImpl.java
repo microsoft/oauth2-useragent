@@ -7,6 +7,7 @@ import com.microsoft.alm.oauth2.useragent.subprocess.DefaultProcessFactory;
 import com.microsoft.alm.oauth2.useragent.subprocess.ProcessCoordinator;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
+import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -82,8 +83,13 @@ public class UserAgentImpl implements UserAgent {
             provider = determineProvider(userAgentProvider);
         }
         provider.augmentProcessParameters(command, classPath);
-        // TODO: is this the best way to add our JAR?
-        classPath.add(System.getProperty("java.class.path"));
+
+        // Locate our class to add it to the classPath
+        final PackageLocator locator = new PackageLocator();
+        final File classPathEntryFile = locator.locatePackage(UserAgentImpl.class);
+        final String classPathEntry = classPathEntryFile.getAbsolutePath();
+        classPath.add(classPathEntry);
+
         addClassPathToCommand(classPath, command, PATH_SEPARATOR);
         command.add("com.microsoft.alm.oauth2.useragent." + provider.getClassName());
         command.add(methodName);
