@@ -66,7 +66,11 @@ public class AuthorizationResponse {
                 final String[] nameAndValue = NAME_VALUE_SEPARATOR.split(pair, 2);
                 try {
                     if (nameAndValue.length != 2) {
-                        throw new AuthorizationException("parsing_error", "Failed to parse server response", null, null);
+                        final StringBuilder sb = new StringBuilder("Failed to parse server response");
+                        if (errorDescription != null) {
+                            sb.append(".\nDetails: ").append(errorDescription);
+                        }
+                        throw new AuthorizationException("parsing_error", sb.toString(), null, null);
                     }
 
                     final String name = URLDecoder.decode(nameAndValue[0], UTF_8);

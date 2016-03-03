@@ -6,6 +6,8 @@ package com.microsoft.alm.oauth2.useragent;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.core.StringContains.*;
+
 public class AuthorizationResponseTest {
 
     @Test public void toString_withState() throws Exception {
@@ -78,6 +80,21 @@ public class AuthorizationResponseTest {
         } catch (final AuthorizationException actual) {
             Assert.assertEquals("parsing_error", actual.getCode());
             // no need to assert a hardcoded error description string
+            return;
+        }
+
+        Assert.fail("Exception should have been thrown by fromString()");
+    }
+
+    @Test public void fromString_erroneousNameValuePairWithStdErr() throws Exception {
+        final String input = "codered&stategreen";
+        final String stdErr = "Insufficient vespene gas";
+
+        try {
+            AuthorizationResponse.fromString(input, stdErr);
+        } catch (final AuthorizationException actual) {
+            Assert.assertEquals("parsing_error", actual.getCode());
+            Assert.assertThat(actual.getDescription(), containsString(stdErr));
             return;
         }
 
