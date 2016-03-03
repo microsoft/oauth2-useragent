@@ -61,7 +61,7 @@ public class PackageLocator {
         }
         final URL resourceUrl = codeSource.getLocation();
         if (resourceUrl == null) {
-            throw new Error("CodeSource returned a null location URL");
+            return null;
         }
 
         final String canonicalName = classPropertyAccessor.getCanonicalName(clazz);

@@ -11,6 +11,9 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,6 +63,25 @@ public class PackageLocatorTest {
         final URI actual = PackageLocator.stripSchemes(uri);
 
         Assert.assertEquals(URI.create("/PATH.xyz.jar!/classpath.class"), actual);
+    }
+
+    /**
+     * IntelliJ IDEA plugins return {@code null} when asked for {@link CodeSource#getLocation()}
+     */
+    @Test public void locatePackage_fallbackOnNullCodeSourceLocation() throws Exception {
+        final URL url
+                = new URL("jar:file:/abc/def.jar!/com/microsoft/alm/oauth2/useragent/utils/PackageLocatorTest.class");
+        final CodeSource codesource = new CodeSource(null, (Certificate[])null);
+        final ProtectionDomain protectionDomain = new ProtectionDomain(codesource, null);
+
+        when(classPropertyAccessorMock.getProtectionDomain(testClazz)).thenReturn(protectionDomain);
+        when(classPropertyAccessorMock.getResource(testClazz, testClazz.getSimpleName() + ".class")).thenReturn(url);
+        when(classPropertyAccessorMock.getCanonicalName(testClazz)).thenReturn(testClazz.getCanonicalName());
+
+        final File actual = underTest.locatePackage(testClazz);
+
+        assertEquals("/abc/def.jar", actual);
+
     }
 
     @Test public void locatePackage_fallbackToJarResourceOnSecurityException() throws Exception {
