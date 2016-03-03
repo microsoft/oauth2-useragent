@@ -37,17 +37,21 @@ public class PackageLocator {
         }
 
         // Inspired by http://stackoverflow.com/a/12733172
-        File classFilePath;
-        try {
-            classFilePath = getClasspathFromProtectionDomain(clazz);
-        } catch (final SecurityException ignored) {
+        File classFilePath = getClasspathFromProtectionDomain(clazz);
+        if (classFilePath == null) {
             classFilePath = getClasspathFromResource(clazz);
         }
         return classFilePath;
     }
 
     private File getClasspathFromProtectionDomain(final Class clazz) throws SecurityException {
-        final ProtectionDomain protectionDomain = classPropertyAccessor.getProtectionDomain(clazz);
+        ProtectionDomain protectionDomain;
+        try {
+            protectionDomain = classPropertyAccessor.getProtectionDomain(clazz);
+        }
+        catch (final SecurityException ignored) {
+            return null;
+        }
         if (protectionDomain == null) {
             throw new Error("Unable to determine the ProtectionDomain for the specified class");
         }
