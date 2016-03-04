@@ -1,6 +1,6 @@
-These notes are for release *0.6.0*.  Other releases and their notes can be found at the [oauth2-useragent GitHub Releases]() page.
+These notes are for release *(to be determined)*.  Other releases and their notes can be found at the [oauth2-useragent GitHub Releases](https://github.com/Microsoft/oauth2-useragent/releases) page.
 
 * Major:
-    * Improved the determination of the sub-process classpath.  Thanks to Yang Cao (@yacaovsnc) who helped fixed issue #9 with pull request #14.
+    * TODO
 * Minor:
-    * Content in the sub-process `stderr` stream will no longer cause an authentication failure.  Thanks to Yang Cao (@yacaovsnc) who fixed issue #10, made possible with pull requests #11, #12 and #15.
+    * TODO
