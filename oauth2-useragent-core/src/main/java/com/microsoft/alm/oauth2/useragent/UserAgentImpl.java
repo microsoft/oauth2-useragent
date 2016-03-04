@@ -96,35 +96,23 @@ public class UserAgentImpl implements UserAgent {
         //noinspection ToArrayCallWithZeroLengthArrayArgument
         final String[] args = command.toArray(EMPTY_STRING_ARRAY);
 
-        ProcessCoordinator coordinator = null;
         try {
             final TestableProcess process = processFactory.create(args);
-            coordinator = new ProcessCoordinator(process);
+            final ProcessCoordinator coordinator = new ProcessCoordinator(process);
             for (final String parameter : parameters) {
                 coordinator.println(parameter);
             }
             coordinator.waitFor();
 
             final String response = coordinator.getStdOut();
-            return AuthorizationResponse.fromString(response);
+            final String errorContents = coordinator.getStdErr();
+            return AuthorizationResponse.fromString(response, errorContents);
         }
         catch (final IOException e) {
             throw new AuthorizationException("io_exception", e.getMessage(), null, e);
         }
         catch (final InterruptedException e) {
             throw new AuthorizationException("interrupted_exception", e.getMessage(), null, e);
-        }
-        catch (final AuthorizationException e) {
-            if ("parsing_error".equals(e.getCode()) && coordinator != null) {
-                final String errorContents = coordinator.getStdErr();
-                if (errorContents.length() > 0) {
-                    // Maybe parsing failed because subprocess failed, pass the subprocess error up
-                    throw new AuthorizationException("subprocess_error", errorContents, null, e);
-                }
-            }
-
-            // there is no subprocess error to decorate this exception, rethrow
-            throw e;
         }
     }
 

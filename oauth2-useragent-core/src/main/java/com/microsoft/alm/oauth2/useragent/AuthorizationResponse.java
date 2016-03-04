@@ -50,19 +50,29 @@ public class AuthorizationResponse {
     }
 
     public static AuthorizationResponse fromString(final String s) throws AuthorizationException {
+        return fromString(s, null);
+    }
+
+    public static AuthorizationResponse fromString(final String s, final String potentialDescription) throws AuthorizationException {
         String code = null;
         String state = null;
         String error = "unknown_error";
-        String errorDescription = null;
+        String errorDescription = potentialDescription;
         String errorUriString = null;
-        if (s != null) {
-            final String[] pairs = PAIR_SEPARATOR.split(s.trim());
+        if (s != null && s.length() > 0) {
+            final String trimmed = s.trim();
+            final String[] pairs = PAIR_SEPARATOR.split(trimmed);
 
             for (final String pair : pairs) {
                 final String[] nameAndValue = NAME_VALUE_SEPARATOR.split(pair, 2);
                 try {
                     if (nameAndValue.length != 2) {
-                        throw new AuthorizationException("parsing_error", "Failed to parse server response", null, null);
+                        final StringBuilder sb = new StringBuilder("Failed to parse response: ");
+                        sb.append("'").append(trimmed).append("'.");
+                        if (errorDescription != null) {
+                            sb.append("\n").append("Additional information: ").append(errorDescription);
+                        }
+                        throw new AuthorizationException("parsing_error", sb.toString(), null, null);
                     }
 
                     final String name = URLDecoder.decode(nameAndValue[0], UTF_8);

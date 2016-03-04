@@ -98,7 +98,7 @@ public class UserAgentImplTest {
         }
         catch (final AuthorizationException e) {
             Assert.assertEquals(stackTrace, e.getDescription().trim());
-            Assert.assertEquals("subprocess_error", e.getCode());
+            Assert.assertEquals("unknown_error", e.getCode());
             return;
         }
         Assert.fail("An AuthorizationException should have been thrown.");
