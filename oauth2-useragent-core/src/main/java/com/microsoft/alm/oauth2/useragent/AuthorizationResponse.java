@@ -67,9 +67,10 @@ public class AuthorizationResponse {
                 final String[] nameAndValue = NAME_VALUE_SEPARATOR.split(pair, 2);
                 try {
                     if (nameAndValue.length != 2) {
-                        final StringBuilder sb = new StringBuilder("Failed to parse server response");
+                        final StringBuilder sb = new StringBuilder("Failed to parse response: ");
+                        sb.append("'").append(trimmed).append("'.");
                         if (errorDescription != null) {
-                            sb.append(".\nDetails: ").append(errorDescription);
+                            sb.append("\n").append("Additional information: ").append(errorDescription);
                         }
                         throw new AuthorizationException("parsing_error", sb.toString(), null, null);
                     }

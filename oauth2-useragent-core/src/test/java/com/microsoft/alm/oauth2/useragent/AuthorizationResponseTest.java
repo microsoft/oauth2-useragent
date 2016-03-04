@@ -94,6 +94,7 @@ public class AuthorizationResponseTest {
             AuthorizationResponse.fromString(input, stdErr);
         } catch (final AuthorizationException actual) {
             Assert.assertEquals("parsing_error", actual.getCode());
+            Assert.assertThat(actual.getDescription(), containsString(input));
             Assert.assertThat(actual.getDescription(), containsString(stdErr));
             return;
         }
