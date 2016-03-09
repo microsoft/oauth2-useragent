@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -39,9 +40,34 @@ public class UserAgentImpl implements UserAgent {
     static final String UTF_8 = "UTF-8";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final Set<String> NETWORKING_PROPERTY_NAMES;
     private static final Map<String, String> SAFE_REPLACEMENTS;
 
     static {
+        // http://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
+        final Set<String> networkingPropertyNames = new HashSet<String>();
+        // HTTP
+        networkingPropertyNames.add("http.proxyHost");
+        networkingPropertyNames.add("http.proxyPort");
+        networkingPropertyNames.add("http.nonProxyHosts");
+
+        // HTTPS
+        networkingPropertyNames.add("https.proxyHost");
+        networkingPropertyNames.add("https.proxyPort");
+
+        // SOCKS
+        networkingPropertyNames.add("socksProxyHost");
+        networkingPropertyNames.add("socksProxyPort");
+        networkingPropertyNames.add("socksProxyVersion");
+        networkingPropertyNames.add("java.net.socks.username");
+        networkingPropertyNames.add("java.net.socks.password");
+
+        networkingPropertyNames.add("java.net.useSystemProxies");
+
+        // Misc HTTP properties
+        networkingPropertyNames.add("http.auth.ntlm.domain");
+        NETWORKING_PROPERTY_NAMES = Collections.unmodifiableSet(networkingPropertyNames);
+
         final HashMap<String, String> map = new HashMap<String, String>();
         map.put("+", " ");
         map.put("%28", "(");
