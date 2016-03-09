@@ -116,6 +116,15 @@ public class UserAgentImpl implements UserAgent {
         }
     }
 
+    static void relayProperties(final Properties properties, final Set<String> propertyNames, final List<String> destinationCommand) {
+        for (final String propertyName : propertyNames) {
+            final String propertyValue = properties.getProperty(propertyName);
+            if (propertyValue != null) {
+                destinationCommand.add("-D" + propertyName + "=" + propertyValue);
+            }
+        }
+    }
+
     void addClassPathToCommand(final List<String> classPath, final List<String> command, final String pathSeparator) {
         command.add("-classpath");
         //noinspection ToArrayCallWithZeroLengthArrayArgument
