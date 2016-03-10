@@ -110,6 +110,8 @@ public class UserAgentImpl implements UserAgent {
         }
         provider.augmentProcessParameters(command, classPath);
 
+        relayProperties(System.getProperties(), NETWORKING_PROPERTY_NAMES, command);
+
         // Locate our class to add it to the classPath
         final PackageLocator locator = new PackageLocator();
         final File classPathEntryFile = locator.locatePackage(UserAgentImpl.class);
