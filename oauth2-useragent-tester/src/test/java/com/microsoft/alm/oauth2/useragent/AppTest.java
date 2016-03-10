@@ -21,16 +21,16 @@ public class AppTest {
 
     private static final String PROTOCOL = "http";
     private static final String HOST = "localhost";
-    private static final int PORT = 8089;
 
-    @Rule public WireMockRule wireMockRule = new WireMockRule(PORT);
+    @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
     @Category(IntegrationTests.class)
     @Test public void main_wiremock() throws URISyntaxException, AuthorizationException {
-        final URI authorizationEndpoint = new URI(PROTOCOL, null, HOST, PORT, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
-        final URI authorizationConfirmation = new URI(PROTOCOL, null, HOST, PORT, "/oauth2/confirm", "state=chicken", null);
+        final int port = wireMockRule.port();
+        final URI authorizationEndpoint = new URI(PROTOCOL, null, HOST, port, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
+        final URI authorizationConfirmation = new URI(PROTOCOL, null, HOST, port, "/oauth2/confirm", "state=chicken", null);
         final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
-        final URI redirectUri = new URI(PROTOCOL, null, HOST, PORT, "/finished", "code=steak&state=chicken", null);
+        final URI redirectUri = new URI(PROTOCOL, null, HOST, port, "/finished", "code=steak&state=chicken", null);
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
                         .withStatus(200)
