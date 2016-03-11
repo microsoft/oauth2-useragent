@@ -100,4 +100,49 @@ public class AppTest {
         }
     }
 
+    @Category(IntegrationTests.class)
+    @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
+        final Properties oldProperties = System.getProperties();
+        final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
+
+        final String listenAddress = "0.0.0.0" /* all interfaces */;
+        final int listenPort = 0 /* automatic port */;
+        final InetSocketAddress requestedAddress = new InetSocketAddress(listenAddress, listenPort);
+        final HttpProxyServer proxyServer =
+                DefaultHttpProxyServer
+                        .bootstrap()
+                        .withAddress(requestedAddress)
+                        .withFiltersSource(adapter)
+                        .start();
+
+        try {
+            final Properties tempProperties = new Properties(oldProperties);
+            final InetAddress localHost = InetAddress.getLocalHost();
+            tempProperties.setProperty("https.proxyHost", localHost.getHostName());
+            tempProperties.setProperty("http.proxyHost", localHost.getHostName());
+            final InetSocketAddress proxyAddress = proxyServer.getListenAddress();
+            final String proxyPort = Integer.toString(proxyAddress.getPort(), 10);
+            tempProperties.setProperty("https.proxyPort", proxyPort);
+            tempProperties.setProperty("http.proxyPort", proxyPort);
+            System.setProperties(tempProperties);
+
+            final String[] args = {"https://visualstudio.com", "https://www.visualstudio.com"};
+
+            boolean exceptionWasThrown = false;
+            try {
+                App.main(args);
+            }
+            catch (final AuthorizationException ignored) {
+                // we can't distinguish failure to connect from a successful redirect!
+                exceptionWasThrown = true;
+            }
+
+            Assert.assertTrue(exceptionWasThrown);
+            Assert.assertTrue(adapter.proxyWasUsed());
+        }
+        finally {
+            proxyServer.stop();
+            System.setProperties(oldProperties);
+        }
+    }
 }

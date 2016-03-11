@@ -44,6 +44,7 @@ public class LoggingFiltersSourceAdapter extends HttpFiltersSourceAdapter {
         return new HttpFiltersAdapter(originalRequest, ctx) {
             @Override public HttpResponse clientToProxyRequest(final HttpObject httpObject) {
                 requests.add((FullHttpRequest) httpObject);
+                //httpObject.
                 return /* "[return] null to continue processing as usual" */ null;
             }
 
