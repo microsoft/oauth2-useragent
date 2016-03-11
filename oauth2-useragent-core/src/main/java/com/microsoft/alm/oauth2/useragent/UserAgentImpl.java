@@ -248,7 +248,7 @@ public class UserAgentImpl implements UserAgent {
             final String encodedKey = sortOfUrlEncode(key);
 
             final String value = (String) pairs.get(key);
-            final String encodedValue = sortOfUrlEncode(value);
+            final String encodedValue = value == null ? "" : sortOfUrlEncode(value);
 
             destination.append(encodedKey).append('=').append(encodedValue).append(NEW_LINE);
         }

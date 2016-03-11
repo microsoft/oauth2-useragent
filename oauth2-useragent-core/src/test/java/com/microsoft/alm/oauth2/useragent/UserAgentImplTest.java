@@ -146,6 +146,22 @@ public class UserAgentImplTest {
         );
     }
 
+    @Test public void appendPairs_nullValue() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
+        variables.put("HOME", null);
+
+        UserAgentImpl.appendPairs(variables.keySet(), variables, sb, "BEGIN", "END");
+
+        assertLinesEqual(sb.toString(),
+                "BEGIN",
+                "",
+                "HOME=",
+                "",
+                "END"
+        );
+    }
+
     private static void assertLinesEqual(final String actual, final String... expectedLines) {
         final StringReader sr = new StringReader(actual);
         try {
