@@ -9,8 +9,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -20,17 +22,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 public class AppTest {
 
     private static final String PROTOCOL = "http";
-    private static final String HOST = "localhost";
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
     @Category(IntegrationTests.class)
-    @Test public void main_wiremock() throws URISyntaxException, AuthorizationException {
+    @Test public void main_wiremock() throws URISyntaxException, AuthorizationException, UnknownHostException {
         final int port = wireMockRule.port();
-        final URI authorizationEndpoint = new URI(PROTOCOL, null, HOST, port, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
-        final URI authorizationConfirmation = new URI(PROTOCOL, null, HOST, port, "/oauth2/confirm", "state=chicken", null);
+        final InetAddress localHostAddress = InetAddress.getLocalHost();
+        final String host = localHostAddress.getHostName();
+        final URI authorizationEndpoint = new URI(PROTOCOL, null, host, port, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
+        final URI authorizationConfirmation = new URI(PROTOCOL, null, host, port, "/oauth2/confirm", "state=chicken", null);
         final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
-        final URI redirectUri = new URI(PROTOCOL, null, HOST, port, "/finished", "code=steak&state=chicken", null);
+        final URI redirectUri = new URI(PROTOCOL, null, host, port, "/finished", "code=steak&state=chicken", null);
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
                         .withStatus(200)
