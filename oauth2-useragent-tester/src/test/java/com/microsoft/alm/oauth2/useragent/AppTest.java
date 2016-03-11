@@ -8,11 +8,15 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.Properties;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -62,4 +66,38 @@ public class AppTest {
         Assert.assertEquals("chicken", App.state);
 
     }
+
+    @Category(IntegrationTests.class)
+    @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
+        final Properties oldProperties = System.getProperties();
+        final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
+
+        final String listenAddress = "0.0.0.0" /* all interfaces */;
+        final int listenPort = 0 /* automatic port */;
+        final InetSocketAddress requestedAddress = new InetSocketAddress(listenAddress, listenPort);
+        final HttpProxyServer proxyServer =
+            DefaultHttpProxyServer
+                .bootstrap()
+                .withAddress(requestedAddress)
+                .withFiltersSource(adapter)
+                .start();
+
+        try {
+            final Properties tempProperties = new Properties(oldProperties);
+            final InetAddress localHost = InetAddress.getLocalHost();
+            tempProperties.setProperty("http.proxyHost", localHost.getHostName());
+            final InetSocketAddress proxyAddress = proxyServer.getListenAddress();
+            tempProperties.setProperty("http.proxyPort", Integer.toString(proxyAddress.getPort(), 10));
+            System.setProperties(tempProperties);
+
+            main_wiremock();
+
+            Assert.assertTrue(adapter.proxyWasUsed());
+        }
+        finally {
+            proxyServer.stop();
+            System.setProperties(oldProperties);
+        }
+    }
+
 }
