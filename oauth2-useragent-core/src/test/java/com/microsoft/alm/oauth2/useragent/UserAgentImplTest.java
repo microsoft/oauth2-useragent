@@ -18,8 +18,10 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
@@ -144,6 +146,22 @@ public class UserAgentImplTest {
         );
     }
 
+    @Test public void appendPairs_nullValue() throws Exception {
+        final StringBuilder sb = new StringBuilder();
+        final LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
+        variables.put("HOME", null);
+
+        UserAgentImpl.appendPairs(variables.keySet(), variables, sb, "BEGIN", "END");
+
+        assertLinesEqual(sb.toString(),
+                "BEGIN",
+                "",
+                "HOME=",
+                "",
+                "END"
+        );
+    }
+
     private static void assertLinesEqual(final String actual, final String... expectedLines) {
         final StringReader sr = new StringReader(actual);
         try {
@@ -179,6 +197,28 @@ public class UserAgentImplTest {
         finally {
             sr.close();
         }
+    }
+
+    @Test public void relayProperties_typical() throws Exception {
+        final HashSet<String> propertyNames = new HashSet<String>(Arrays.asList("http.proxyHost", "http.proxyPort"));
+        final Properties properties = new Properties();
+        properties.setProperty("http.proxyHost", "192.0.2.42");
+        final List<String> commands = new ArrayList<String>();
+
+        UserAgentImpl.relayProperties(properties, propertyNames, commands);
+
+        Assert.assertEquals(1, commands.size());
+        Assert.assertEquals("-Dhttp.proxyHost=192.0.2.42", commands.get(0));
+    }
+
+    @Test public void relayProperties_noneSet() throws Exception {
+        final HashSet<String> propertyNames = new HashSet<String>(Arrays.asList("http.proxyHost", "http.proxyPort"));
+        final Properties properties = new Properties();
+        final List<String> commands = new ArrayList<String>();
+
+        UserAgentImpl.relayProperties(properties, propertyNames, commands);
+
+        Assert.assertEquals(0, commands.size());
     }
 
     @Test public void determineProvider_Compatible() {

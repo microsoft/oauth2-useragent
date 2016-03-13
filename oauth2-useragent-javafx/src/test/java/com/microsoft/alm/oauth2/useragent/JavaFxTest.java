@@ -27,10 +27,8 @@ public class JavaFxTest {
 
     private static final String INSECURE_PROTOCOL = "https";
     private static final String HOST = "localhost";
-    private static final int PORT = 8089;
-    private static final int INSECURE_PORT = 9443;
 
-    @Rule public WireMockRule wireMockRule = new WireMockRule(PORT, INSECURE_PORT);
+    @Rule public WireMockRule wireMockRule = new WireMockRule(0, 0);
 
     private final AtomicReference<Exception> expectedExceptionRef = new AtomicReference<>();
     private final AtomicReference<Exception> actualExceptionRef = new AtomicReference<>();
@@ -104,8 +102,9 @@ public class JavaFxTest {
     @Category(IntegrationTests.class)
     @Test public void insecureWiremock() throws URISyntaxException, AuthorizationException {
         expectedExceptionRef.set(new AuthorizationException("load_error", "java.lang.Throwable: SSL handshake failed", null, null));
-        final URI authorizationEndpoint = new URI(INSECURE_PROTOCOL, null, HOST, INSECURE_PORT, "/oauth2/authorize", "response_type=code&client_id=insecureWiremock&state=chicken", null);
-        final URI redirectUri = new URI(INSECURE_PROTOCOL, null, HOST, INSECURE_PORT, "/finished", null, null);
+        final int insecurePort = wireMockRule.httpsPort();
+        final URI authorizationEndpoint = new URI(INSECURE_PROTOCOL, null, HOST, insecurePort, "/oauth2/authorize", "response_type=code&client_id=insecureWiremock&state=chicken", null);
+        final URI redirectUri = new URI(INSECURE_PROTOCOL, null, HOST, insecurePort, "/finished", null, null);
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
                         .withStatus(200)

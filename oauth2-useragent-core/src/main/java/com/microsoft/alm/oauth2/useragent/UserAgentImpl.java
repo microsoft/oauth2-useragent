@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -39,9 +40,34 @@ public class UserAgentImpl implements UserAgent {
     static final String UTF_8 = "UTF-8";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final Set<String> NETWORKING_PROPERTY_NAMES;
     private static final Map<String, String> SAFE_REPLACEMENTS;
 
     static {
+        // http://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
+        final Set<String> networkingPropertyNames = new HashSet<String>();
+        // HTTP
+        networkingPropertyNames.add("http.proxyHost");
+        networkingPropertyNames.add("http.proxyPort");
+        networkingPropertyNames.add("http.nonProxyHosts");
+
+        // HTTPS
+        networkingPropertyNames.add("https.proxyHost");
+        networkingPropertyNames.add("https.proxyPort");
+
+        // SOCKS
+        networkingPropertyNames.add("socksProxyHost");
+        networkingPropertyNames.add("socksProxyPort");
+        networkingPropertyNames.add("socksProxyVersion");
+        networkingPropertyNames.add("java.net.socks.username");
+        networkingPropertyNames.add("java.net.socks.password");
+
+        networkingPropertyNames.add("java.net.useSystemProxies");
+
+        // Misc HTTP properties
+        networkingPropertyNames.add("http.auth.ntlm.domain");
+        NETWORKING_PROPERTY_NAMES = Collections.unmodifiableSet(networkingPropertyNames);
+
         final HashMap<String, String> map = new HashMap<String, String>();
         map.put("+", " ");
         map.put("%28", "(");
@@ -84,6 +110,8 @@ public class UserAgentImpl implements UserAgent {
         }
         provider.augmentProcessParameters(command, classPath);
 
+        relayProperties(System.getProperties(), NETWORKING_PROPERTY_NAMES, command);
+
         // Locate our class to add it to the classPath
         final PackageLocator locator = new PackageLocator();
         final File classPathEntryFile = locator.locatePackage(UserAgentImpl.class);
@@ -113,6 +141,15 @@ public class UserAgentImpl implements UserAgent {
         }
         catch (final InterruptedException e) {
             throw new AuthorizationException("interrupted_exception", e.getMessage(), null, e);
+        }
+    }
+
+    static void relayProperties(final Properties properties, final Set<String> propertyNames, final List<String> destinationCommand) {
+        for (final String propertyName : propertyNames) {
+            final String propertyValue = properties.getProperty(propertyName);
+            if (propertyValue != null) {
+                destinationCommand.add("-D" + propertyName + "=" + propertyValue);
+            }
         }
     }
 
@@ -211,7 +248,7 @@ public class UserAgentImpl implements UserAgent {
             final String encodedKey = sortOfUrlEncode(key);
 
             final String value = (String) pairs.get(key);
-            final String encodedValue = sortOfUrlEncode(value);
+            final String encodedValue = value == null ? "" : sortOfUrlEncode(value);
 
             destination.append(encodedKey).append('=').append(encodedValue).append(NEW_LINE);
         }
