@@ -35,14 +35,17 @@ class JavaFxProvider extends Provider {
         final Version version = Version.parseJavaRuntimeVersion(javaRuntimeVersion);
         boolean hasSupportedJava = false;
         // TODO: what about 1.9 or 2.x?
-        switch (version.getMajor()) {
+        final int javaMajorVersion = version.getMajor();
+        final int javaMinorVersion = version.getMinor();
+        final int javaUpdateVersion = version.getUpdate();
+        switch (javaMajorVersion) {
             case 1:
-                switch (version.getMinor()) {
+                switch (javaMinorVersion) {
                     case 8:
                         hasSupportedJava = true;
                         break;
                     case 7:
-                        if (version.getUpdate() >= 6) {
+                        if (javaUpdateVersion >= 6) {
                             hasSupportedJava = true;
                         }
                         break;
