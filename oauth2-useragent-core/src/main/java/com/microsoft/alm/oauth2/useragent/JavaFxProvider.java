@@ -14,7 +14,8 @@ class JavaFxProvider extends Provider {
     private static final List<String> REQUIREMENTS = Collections.unmodifiableList(Arrays.asList(
         "Oracle Java SE 7 update 6 or higher, Oracle Java SE 8, OR OpenJDK 8.",
         "JavaFX or OpenJFX runtime JAR.",
-        "A desktop environment."
+        "A desktop environment.",
+        "Oracle Java SE 7 is not supported on Mac OS X 10.11 and greater.  Please upgrade to Java 8."
     ));
     private final File[] potentialJavaFxJarLocations = new File[]{
         new File(JAVA_HOME, "/lib/jfxrt.jar"),
@@ -54,6 +55,20 @@ class JavaFxProvider extends Provider {
         }
         if (!hasSupportedJava) {
             requirements.add(REQUIREMENTS.get(0));
+        }
+        else {
+            if (isMac(osName)) {
+                if (javaMajorVersion == 1 && javaMinorVersion == 7) {
+                    final Version osVersion = Version.parseVersion(osVersionString);
+                    if (osVersion.getMajor() == 10)
+                    {
+                        if (osVersion.getMinor() >= 11)
+                        {
+                            requirements.add(REQUIREMENTS.get(3));
+                        }
+                    }
+                }
+            }
         }
 
         boolean hasJavaFx = false;

@@ -45,6 +45,10 @@ public class JavaFxProviderTest {
         test(0, "1.7.0_71-b14", fakeJarFile, "Mac OS X", "10.10.5", "/private/tmp/com.apple.launchd.X5no1ibGbp/org.macosforge.xquartz:0");
     }
 
+    @Test public void oracleJava7OnMacOsXElCapitan() {
+        test(1, "1.7.0_71-b14", fakeJarFile, "Mac OS X", "10.11.0", "/private/tmp/com.apple.launchd.X5no1ibGbp/org.macosforge.xquartz:0");
+    }
+
     @Test public void openJdk8OnFedoraViaSsh() {
         test(2, "1.8.0_60-b27", nonExistentFile, "Linux", null, null);
     }
