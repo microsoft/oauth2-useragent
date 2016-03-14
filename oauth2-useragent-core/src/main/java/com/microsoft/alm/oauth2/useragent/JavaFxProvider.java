@@ -30,14 +30,14 @@ class JavaFxProvider extends Provider {
         return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, ENV_DISPLAY);
     }
 
-    static ArrayList<String> checkRequirements(final String javaRuntimeVersion, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
+    static ArrayList<String> checkRequirements(final String javaRuntimeVersionString, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
         final ArrayList<String> requirements = new ArrayList<String>();
-        final Version version = Version.parseJavaRuntimeVersion(javaRuntimeVersion);
+        final Version javaVersion = Version.parseJavaRuntimeVersion(javaRuntimeVersionString);
         boolean hasSupportedJava = false;
         // TODO: what about 1.9 or 2.x?
-        final int javaMajorVersion = version.getMajor();
-        final int javaMinorVersion = version.getMinor();
-        final int javaUpdateVersion = version.getUpdate();
+        final int javaMajorVersion = javaVersion.getMajor();
+        final int javaMinorVersion = javaVersion.getMinor();
+        final int javaUpdateVersion = javaVersion.getUpdate();
         switch (javaMajorVersion) {
             case 1:
                 switch (javaMinorVersion) {
