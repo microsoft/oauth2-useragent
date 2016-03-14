@@ -27,10 +27,10 @@ class JavaFxProvider extends Provider {
 
     @Override public List<String> checkRequirements() {
 
-        return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, ENV_DISPLAY);
+        return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, OS_VERSION, ENV_DISPLAY);
     }
 
-    static ArrayList<String> checkRequirements(final String javaRuntimeVersionString, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
+    static ArrayList<String> checkRequirements(final String javaRuntimeVersionString, final File[] potentialJavaFxJarLocations, final String osName, final String osVersionString, final String displayVariable) {
         final ArrayList<String> requirements = new ArrayList<String>();
         final Version javaVersion = Version.parseJavaRuntimeVersion(javaRuntimeVersionString);
         boolean hasSupportedJava = false;
