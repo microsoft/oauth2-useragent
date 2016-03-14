@@ -31,7 +31,7 @@ class JavaFxProvider extends Provider {
     }
 
     static ArrayList<String> checkRequirements(final String javaRuntimeVersion, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
-        final ArrayList<String> requirements = new ArrayList<String>(REQUIREMENTS);
+        final ArrayList<String> requirements = new ArrayList<String>();
         final Version version = Version.parseJavaRuntimeVersion(javaRuntimeVersion);
         boolean hasSupportedJava = false;
         // TODO: what about 1.9 or 2.x?
@@ -52,8 +52,8 @@ class JavaFxProvider extends Provider {
                 }
                 break;
         }
-        if (hasSupportedJava) {
-            requirements.remove(REQUIREMENTS.get(0));
+        if (!hasSupportedJava) {
+            requirements.add(REQUIREMENTS.get(0));
         }
 
         boolean hasJavaFx = false;
@@ -63,8 +63,8 @@ class JavaFxProvider extends Provider {
                 break;
             }
         }
-        if (hasJavaFx) {
-            requirements.remove(REQUIREMENTS.get(1));
+        if (!hasJavaFx) {
+            requirements.add(REQUIREMENTS.get(1));
         }
 
         boolean hasDesktop = false;
@@ -81,8 +81,8 @@ class JavaFxProvider extends Provider {
                 hasDesktop = true;
             }
         }
-        if (hasDesktop) {
-            requirements.remove(REQUIREMENTS.get(2));
+        if (!hasDesktop) {
+            requirements.add(REQUIREMENTS.get(2));
         }
 
         return requirements;
