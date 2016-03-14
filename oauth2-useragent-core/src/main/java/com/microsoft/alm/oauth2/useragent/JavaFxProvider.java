@@ -18,8 +18,8 @@ class JavaFxProvider extends Provider {
         "Oracle Java SE 7 is not supported on Mac OS X 10.11 and greater.  Please upgrade to Java 8."
     ));
     private final File[] potentialJavaFxJarLocations = new File[]{
-        new File(JAVA_HOME, "/lib/jfxrt.jar"),
-        new File(JAVA_HOME, "/lib/ext/jfxrt.jar"),
+        new File(JAVA_HOME, "lib/jfxrt.jar"),
+        new File(JAVA_HOME, "lib/ext/jfxrt.jar"),
     };
 
     protected JavaFxProvider() {
