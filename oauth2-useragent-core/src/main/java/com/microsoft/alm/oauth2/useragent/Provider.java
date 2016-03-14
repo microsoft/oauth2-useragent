@@ -13,6 +13,7 @@ public abstract class Provider {
     static final String JAVA_VM_NAME = System.getProperty("java.vm.name");
     static final String JAVA_HOME = System.getProperty("java.home");
     static final String OS_NAME = System.getProperty("os.name");
+    static final String OS_VERSION = System.getProperty("os.version");
     static final String ENV_DISPLAY = System.getenv("DISPLAY");
 
     public static final Provider JAVA_FX = new JavaFxProvider();

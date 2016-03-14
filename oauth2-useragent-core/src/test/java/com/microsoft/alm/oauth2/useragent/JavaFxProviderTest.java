@@ -23,33 +23,37 @@ public class JavaFxProviderTest {
         nonExistentFile.delete();
     }
 
-    private void test(final int expectedRequirements, final String version, final File potentialJavaFxJarFile, final String osName, final String display) {
+    private void test(final int expectedRequirements, final String version, final File potentialJavaFxJarFile, final String osName, final String osVersionString, final String display) {
         final File[] potentialJavaFxJarFiles = {
             potentialJavaFxJarFile
         };
 
-        final ArrayList<String> actual = JavaFxProvider.checkRequirements(version, potentialJavaFxJarFiles, osName, display);
+        final ArrayList<String> actual = JavaFxProvider.checkRequirements(version, potentialJavaFxJarFiles, osName, osVersionString, display);
 
         Assert.assertEquals(expectedRequirements, actual.size());
     }
 
     @Test public void oracleJdk6OnWindows() {
-        test(2, "1.6.0_20-b02", nonExistentFile, "Windows", null);
+        test(2, "1.6.0_20-b02", nonExistentFile, "Windows", null, null);
     }
 
     @Test public void oracleJdk8OnWindows() {
-        test(0, "1.8.0_60-b27", fakeJarFile, "Windows", null);
+        test(0, "1.8.0_60-b27", fakeJarFile, "Windows", null, null);
     }
 
     @Test public void oracleJdk7OnMacOsX() {
-        test(0, "1.7.0_71-b14", fakeJarFile, "Mac OS X", "/private/tmp/com.apple.launchd.X5no1ibGbp/org.macosforge.xquartz:0");
+        test(0, "1.7.0_71-b14", fakeJarFile, "Mac OS X", "10.10.5", "/private/tmp/com.apple.launchd.X5no1ibGbp/org.macosforge.xquartz:0");
+    }
+
+    @Test public void oracleJava7OnMacOsXElCapitan() {
+        test(1, "1.7.0_71-b14", fakeJarFile, "Mac OS X", "10.11.0", "/private/tmp/com.apple.launchd.X5no1ibGbp/org.macosforge.xquartz:0");
     }
 
     @Test public void openJdk8OnFedoraViaSsh() {
-        test(2, "1.8.0_60-b27", nonExistentFile, "Linux", null);
+        test(2, "1.8.0_60-b27", nonExistentFile, "Linux", null, null);
     }
 
     @Test public void openJdk8OnFedoraViaDesktop() {
-        test(1, "1.8.0_60-b27", nonExistentFile, "Linux", ":1");
+        test(1, "1.8.0_60-b27", nonExistentFile, "Linux", null, ":1");
     }
 }

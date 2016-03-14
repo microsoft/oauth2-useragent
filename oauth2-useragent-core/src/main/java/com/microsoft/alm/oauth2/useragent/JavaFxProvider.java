@@ -14,11 +14,12 @@ class JavaFxProvider extends Provider {
     private static final List<String> REQUIREMENTS = Collections.unmodifiableList(Arrays.asList(
         "Oracle Java SE 7 update 6 or higher, Oracle Java SE 8, OR OpenJDK 8.",
         "JavaFX or OpenJFX runtime JAR.",
-        "A desktop environment."
+        "A desktop environment.",
+        "Oracle Java SE 7 is not supported on Mac OS X 10.11 and greater.  Please upgrade to Java 8."
     ));
     private final File[] potentialJavaFxJarLocations = new File[]{
-        new File(JAVA_HOME, "/lib/jfxrt.jar"),
-        new File(JAVA_HOME, "/lib/ext/jfxrt.jar"),
+        new File(JAVA_HOME, "lib/jfxrt.jar"),
+        new File(JAVA_HOME, "lib/ext/jfxrt.jar"),
     };
 
     protected JavaFxProvider() {
@@ -27,30 +28,47 @@ class JavaFxProvider extends Provider {
 
     @Override public List<String> checkRequirements() {
 
-        return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, ENV_DISPLAY);
+        return checkRequirements(JAVA_RUNTIME_VERSION, potentialJavaFxJarLocations, OS_NAME, OS_VERSION, ENV_DISPLAY);
     }
 
-    static ArrayList<String> checkRequirements(final String javaRuntimeVersion, final File[] potentialJavaFxJarLocations, final String osName, final String displayVariable) {
-        final ArrayList<String> requirements = new ArrayList<String>(REQUIREMENTS);
-        final Version version = Version.parseJavaRuntimeVersion(javaRuntimeVersion);
+    static ArrayList<String> checkRequirements(final String javaRuntimeVersionString, final File[] potentialJavaFxJarLocations, final String osName, final String osVersionString, final String displayVariable) {
+        final ArrayList<String> requirements = new ArrayList<String>();
+        final Version javaVersion = Version.parseJavaRuntimeVersion(javaRuntimeVersionString);
         boolean hasSupportedJava = false;
         // TODO: what about 1.9 or 2.x?
-        switch (version.getMajor()) {
+        final int javaMajorVersion = javaVersion.getMajor();
+        final int javaMinorVersion = javaVersion.getMinor();
+        final int javaUpdateVersion = javaVersion.getUpdate();
+        switch (javaMajorVersion) {
             case 1:
-                switch (version.getMinor()) {
+                switch (javaMinorVersion) {
                     case 8:
                         hasSupportedJava = true;
                         break;
                     case 7:
-                        if (version.getUpdate() >= 6) {
+                        if (javaUpdateVersion >= 6) {
                             hasSupportedJava = true;
                         }
                         break;
                 }
                 break;
         }
-        if (hasSupportedJava) {
-            requirements.remove(REQUIREMENTS.get(0));
+        if (!hasSupportedJava) {
+            requirements.add(REQUIREMENTS.get(0));
+        }
+        else {
+            if (isMac(osName)) {
+                if (javaMajorVersion == 1 && javaMinorVersion == 7) {
+                    final Version osVersion = Version.parseVersion(osVersionString);
+                    if (osVersion.getMajor() == 10)
+                    {
+                        if (osVersion.getMinor() >= 11)
+                        {
+                            requirements.add(REQUIREMENTS.get(3));
+                        }
+                    }
+                }
+            }
         }
 
         boolean hasJavaFx = false;
@@ -60,8 +78,8 @@ class JavaFxProvider extends Provider {
                 break;
             }
         }
-        if (hasJavaFx) {
-            requirements.remove(REQUIREMENTS.get(1));
+        if (!hasJavaFx) {
+            requirements.add(REQUIREMENTS.get(1));
         }
 
         boolean hasDesktop = false;
@@ -78,8 +96,8 @@ class JavaFxProvider extends Provider {
                 hasDesktop = true;
             }
         }
-        if (hasDesktop) {
-            requirements.remove(REQUIREMENTS.get(2));
+        if (!hasDesktop) {
+            requirements.add(REQUIREMENTS.get(2));
         }
 
         return requirements;
