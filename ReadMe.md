@@ -1,4 +1,4 @@
-Microsoft OAuth 2.0 User Agent library for Java 0.6.0
+Microsoft OAuth 2.0 User Agent library for Java 0.7.1
 ==================================
 Provides classes to facilitate the implementation of "4.1. Authorization Code Grant" from RFC 6749, specifically by auto-detecting a suitable user-agent (and informing the user if any system requirements are unmet and preventing the use of a user-agent), launching the user-agent and directing it to the authorization endpoint, waiting for the results and returning either the authorization code or the reason for failure.
 
@@ -30,7 +30,7 @@ The following table summarizes the current and planned support for user agents.
 
 | Provider | Minimum Java Version | Requires desktop? | Requires 3rd-party dependency | Notes |
 |--------------------------|------------------------|-------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| JavaFX | Oracle Java 7 Update 6 | Yes | No | Uses WebView and WebEngine.  JavaFx ships with Oracle's Java since version 7 Update 6.  OpenJDK 8 users can [build & install OpenJFX](https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX) |
+| JavaFX | Oracle Java 7 Update 6 (:warning:) | Yes | No | Uses WebView and WebEngine.  JavaFx ships with Oracle's Java since version 7 Update 6.  OpenJDK 8 users can [build & install OpenJFX](https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX). <br />:warning: Mac OS X 10.11 (El Capitan) and greater only work with Oracle Java 8, because it looks like [Java FX is broken on Mac OS X 10.11](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8143907). |
 | SWT (planned) | 1.6 | Yes | Yes | This will use the Standard Widget Toolkit from the Eclipse project, which will require the client either ship with the SWT JAR(s) or download them on-demand. |
 | Device profile (planned) | 1.6 | No | No | For when a web browser isn't available, another device can be used to authenticate.  Preview blog post: [New ADAL 3.x preview–device profile, Linux and OS X sample](http://www.cloudidentity.com/blog/2015/12/02/new-adal-3-x-previewdevice-profile-linux-and-os-x-sample/) |
 
@@ -59,7 +59,7 @@ Maven is the preferred way of referencing this library.  Add the following to yo
   <dependency>
     <groupId>com.microsoft.alm</groupId>
     <artifactId>oauth2-useragent</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.1</version>
   </dependency>
 ```
 
