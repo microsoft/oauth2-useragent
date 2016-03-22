@@ -8,6 +8,7 @@ import com.microsoft.alm.oauth2.useragent.subprocess.ProcessCoordinator;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
 import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
+import com.microsoft.alm.oauth2.useragent.utils.StringHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -183,29 +184,8 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         command.add("-classpath");
         //noinspection ToArrayCallWithZeroLengthArrayArgument
         final String[] classPathComponents = classPath.toArray(EMPTY_STRING_ARRAY);
-        final String classPathString = join(pathSeparator, classPathComponents);
+        final String classPathString = StringHelper.join(pathSeparator, classPathComponents);
         command.add(classPathString);
-    }
-
-    static String join(final String separator, final String[] value)
-    {
-        if (value == null)
-            throw new IllegalArgumentException("value is null");
-
-        // "If separator is null, an empty string (String.Empty) is used instead."
-        final String sep = separator == null ? "" : separator;
-
-        final StringBuilder result = new StringBuilder();
-
-        if (value.length > 0) {
-            result.append(value[0] == null ? "" : value[0]);
-            for (int i = 1; i < value.length; i++) {
-                result.append(sep);
-                result.append(value[i] == null ? "" : value[i]);
-            }
-        }
-
-        return result.toString();
     }
 
     static Provider determineProvider(final String userAgentProvider) {
