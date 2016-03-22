@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -213,39 +214,70 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     static Provider determineProvider(final String userAgentProvider, final List<Provider> providers) {
 
+        final Map<Provider, List<String>> unmetRequirements = new LinkedHashMap<Provider, List<String>>();
+        final Provider result = scanProviders(userAgentProvider, providers, unmetRequirements);
+
+        if (result == null) {
+            final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
+            describeUnmetRequirements(unmetRequirements, sb);
+            sb.append(NEW_LINE);
+            sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+            sb.append(NEW_LINE);
+            sb.append("The following System Properties and Environment Variables would be very useful.");
+            sb.append(NEW_LINE);
+
+            final Properties properties = System.getProperties();
+            appendProperties(properties, sb);
+            sb.append(NEW_LINE);
+
+            final Map<String, String> variables = System.getenv();
+            appendVariables(variables, sb);
+
+            throw new IllegalStateException(sb.toString());
+        }
+        return result;
+    }
+
+    static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements) {
+
+        Provider result = null;
+
         if (userAgentProvider != null) {
             for (final Provider provider : providers) {
                 if (provider.getClassName().equals(userAgentProvider)) {
-                    return provider;
+                    result = provider;
+                    break;
                 }
             }
         }
-        final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
+
         for (final Provider provider : providers) {
             final List<String> requirements = provider.checkRequirements();
             if (requirements == null || requirements.size() == 0) {
-                return provider;
+                if (result == null) {
+                    result = provider;
+                }
             }
-            sb.append(NEW_LINE);
-            sb.append("Unmet requirements for the '").append(provider.getClassName()).append("' provider:").append(NEW_LINE);
-            for (final String requirement : requirements) {
-                sb.append(" - ").append(requirement).append(NEW_LINE);
+            else {
+                destinationUnmetRequirements.put(provider, requirements);
             }
         }
-        sb.append(NEW_LINE);
-        sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
-        sb.append(NEW_LINE);
-        sb.append("The following System Properties and Environment Variables would be very useful.");
-        sb.append(NEW_LINE);
 
-        final Properties properties = System.getProperties();
-        appendProperties(properties, sb);
-        sb.append(NEW_LINE);
+        return result;
+    }
 
-        final Map<String, String> variables = System.getenv();
-        appendVariables(variables, sb);
-
-        throw new IllegalStateException(sb.toString());
+    static void describeUnmetRequirements(final Map<Provider, List<String>> unmetRequirements, final StringBuilder destination) {
+        for (final Map.Entry<Provider, List<String>> pair: unmetRequirements.entrySet()) {
+            final Provider provider = pair.getKey();
+            final List<String> requirements = pair.getValue();
+            if (requirements != null && requirements.size() > 0) {
+                destination.append(NEW_LINE);
+                destination.append("Unmet requirements for the '").append(provider.getClassName()).append("' provider:").append(NEW_LINE);
+                for (final String requirement : requirements) {
+                    destination.append(" - ").append(requirement).append(NEW_LINE);
+                }
+            }
+        }
     }
 
     static void appendProperties(final Properties properties, final StringBuilder destination) {
