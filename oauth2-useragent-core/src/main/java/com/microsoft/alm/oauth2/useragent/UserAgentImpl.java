@@ -40,6 +40,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     static final String PATH_SEPARATOR = System.getProperty("path.separator");
     static final String NEW_LINE = System.getProperty("line.separator");
     static final String UTF_8 = "UTF-8";
+    static final String USER_AGENT_PROVIDER_PROPERTY_NAME = "userAgentProvider";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     private static final Set<String> NETWORKING_PROPERTY_NAMES;
@@ -132,7 +133,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
         if (provider == null) {
-            final String userAgentProvider = System.getProperty("userAgentProvider");
+            final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
             provider = determineProvider(userAgentProvider);
         }
         provider.augmentProcessParameters(command, classPath);
