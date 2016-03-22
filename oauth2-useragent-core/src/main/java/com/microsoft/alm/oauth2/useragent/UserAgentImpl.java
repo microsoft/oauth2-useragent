@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class UserAgentImpl implements UserAgent {
+public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     static final String REQUEST_AUTHORIZATION_CODE = "requestAuthorizationCode";
     static final String JAVA_VERSION_STRING = System.getProperty("java.version");
@@ -90,6 +90,31 @@ public class UserAgentImpl implements UserAgent {
     UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider) {
         this.processFactory = processFactory;
         this.provider = provider;
+    }
+
+    @Override
+    public Provider findCompatibleProvider() {
+        return null;
+    }
+
+    @Override
+    public Provider findCompatibleProvider(final String userAgentProvider) {
+        return null;
+    }
+
+    @Override
+    public Map<Provider, List<String>> getUnmetProviderRequirements() {
+        return null;
+    }
+
+    @Override
+    public boolean hasCompatibleProvider() {
+        return false;
+    }
+
+    @Override
+    public boolean hasCompatibleProvider(final String userAgentProvider) {
+        return false;
     }
 
     @Override
