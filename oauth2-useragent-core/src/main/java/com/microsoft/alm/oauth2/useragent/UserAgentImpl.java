@@ -87,6 +87,8 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     private final List<Provider> candidateProviders;
     private final LinkedHashMap<Provider, List<String>> requirementsByProvider = new LinkedHashMap<Provider, List<String>>();
     private Provider provider;
+    private boolean hasScannedAtLeastOnce = false;
+    private String userAgentProvider = null;
 
     public UserAgentImpl() {
         this(new DefaultProcessFactory(), null, Provider.PROVIDERS);
@@ -105,8 +107,12 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public Provider findCompatibleProvider(final String userAgentProvider) {
-        requirementsByProvider.clear();
-        provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider);
+        if (provider == null || !StringHelper.equal(this.userAgentProvider, userAgentProvider)) {
+            requirementsByProvider.clear();
+            provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider);
+            hasScannedAtLeastOnce = true;
+            this.userAgentProvider = userAgentProvider;
+        }
         return provider;
     }
 
