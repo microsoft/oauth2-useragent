@@ -47,9 +47,11 @@ public class UserAgentImplTest {
     }
 
     @Test public void findCompatibleProvider_atLeastOneCompatible() throws Exception {
-        final Provider compatibleProvider = new CompatibleProvider();
-        final Provider incompatibleProvider = new IncompatibleProvider();
-        final List<Provider> providers = Arrays.asList(incompatibleProvider, compatibleProvider);
+        final CompatibleProvider compatibleProvider = new CompatibleProvider();
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
+        providers.add(compatibleProvider);
         final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
 
         final Provider actual = cut.findCompatibleProvider(null);
@@ -59,11 +61,14 @@ public class UserAgentImplTest {
         Assert.assertEquals(1, actualMap.size());
         final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
         Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
     }
 
     @Test public void findCompatibleProvider_onlyIncompatible() throws Exception {
-        final Provider incompatibleProvider = new IncompatibleProvider();
-        final List<Provider> providers = Collections.singletonList(incompatibleProvider);
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
         final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
 
         final Provider actual = cut.findCompatibleProvider(null);
@@ -73,6 +78,7 @@ public class UserAgentImplTest {
         Assert.assertEquals(1, actualMap.size());
         final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
         Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
     }
 
     @Test public void decode_requestAuthorizationCode() throws AuthorizationException, UnsupportedEncodingException {
@@ -261,16 +267,34 @@ public class UserAgentImplTest {
         Assert.assertEquals(compatibleProvider, actual);
     }
 
-    private static class CompatibleProvider extends Provider {
+    private static abstract class TestHelperProvider extends Provider {
+        private int checkCount = 0;
+
+        TestHelperProvider(final String className) {
+            super(className);
+        }
+
+        @Override public List<String> checkRequirements() {
+            checkCount++;
+            return null;
+        }
+
+        public int getCheckCount() {
+            return checkCount;
+        }
+
+        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
+        }
+    }
+
+    private static class CompatibleProvider extends TestHelperProvider {
         public CompatibleProvider() {
             super("Compatible");
         }
 
         @Override public List<String> checkRequirements() {
+            super.checkRequirements();
             return Collections.emptyList();
-        }
-
-        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
         }
     }
 
@@ -321,7 +345,7 @@ public class UserAgentImplTest {
         Assert.fail("An IllegalStateException should have been thrown");
     }
 
-    private static class IncompatibleProvider extends Provider {
+    private static class IncompatibleProvider extends TestHelperProvider {
         private static final List<String> MISSING_PREREQUISITES = Arrays.asList(
                 "You must construct additional Pylons.",
                 "You have not enough minerals.",
@@ -332,10 +356,8 @@ public class UserAgentImplTest {
         }
 
         @Override public List<String> checkRequirements() {
+            super.checkRequirements();
             return MISSING_PREREQUISITES;
-        }
-
-        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
         }
     }
 }
