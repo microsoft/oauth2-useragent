@@ -324,17 +324,25 @@ public class UserAgentImplTest {
         }
     }
 
-    @Test public void determineProvider_Incompatible() throws IOException {
+    @Test public void scanProvidersAndThrowUnsupported_Incompatible() throws IOException {
         final Provider incompatibleProvider = new IncompatibleProvider();
         //noinspection ArraysAsListWithZeroOrOneArgument
         final List<Provider> providers = Arrays.asList(incompatibleProvider);
+        final LinkedHashMap<Provider, List<String>> unmetMap = new LinkedHashMap<Provider, List<String>>();
+
+        final Provider actualProvider = UserAgentImpl.scanProviders(null, providers, unmetMap);
+
+        Assert.assertEquals(null, actualProvider);
+        Assert.assertEquals(1, unmetMap.size());
+        final List<String> unmetRequirements = unmetMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
 
         try {
-            UserAgentImpl.determineProvider(null, providers);
+            UserAgentImpl.throwUnsupported(unmetMap);
         }
         catch (final IllegalStateException e) {
-            final String actual = e.getMessage();
-            final StringReader sr = new StringReader(actual);
+            final String actualMessage = e.getMessage();
+            final StringReader sr = new StringReader(actualMessage);
             try {
                 final BufferedReader br = new BufferedReader(sr);
                 Assert.assertEquals("I don't support your platform yet.", br.readLine());
