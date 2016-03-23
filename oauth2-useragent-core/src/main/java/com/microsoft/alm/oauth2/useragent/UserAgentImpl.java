@@ -85,6 +85,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     private final TestableProcessFactory processFactory;
     private final List<Provider> candidateProviders;
+    private final LinkedHashMap<Provider, List<String>> requirementsByProvider = new LinkedHashMap<Provider, List<String>>();
     private Provider provider;
 
     public UserAgentImpl() {
@@ -109,7 +110,9 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public Map<Provider, List<String>> getUnmetProviderRequirements() {
-        return null;
+        final Map<Provider, List<String>> copy = new LinkedHashMap<Provider, List<String>>(requirementsByProvider);
+        final Map<Provider, List<String>> result = Collections.unmodifiableMap(copy);
+        return result;
     }
 
     @Override
