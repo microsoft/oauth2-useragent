@@ -219,24 +219,28 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final Provider result = scanProviders(userAgentProvider, providers, unmetRequirements);
 
         if (result == null) {
-            final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
-            describeUnmetRequirements(unmetRequirements, sb);
-            sb.append(NEW_LINE);
-            sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
-            sb.append(NEW_LINE);
-            sb.append("The following System Properties and Environment Variables would be very useful.");
-            sb.append(NEW_LINE);
-
-            final Properties properties = System.getProperties();
-            appendProperties(properties, sb);
-            sb.append(NEW_LINE);
-
-            final Map<String, String> variables = System.getenv();
-            appendVariables(variables, sb);
-
-            throw new IllegalStateException(sb.toString());
+            throwUnsupported(unmetRequirements);
         }
         return result;
+    }
+
+    static void throwUnsupported(final Map<Provider, List<String>> unmetRequirements) {
+        final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
+        describeUnmetRequirements(unmetRequirements, sb);
+        sb.append(NEW_LINE);
+        sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
+        sb.append(NEW_LINE);
+        sb.append("The following System Properties and Environment Variables would be very useful.");
+        sb.append(NEW_LINE);
+
+        final Properties properties = System.getProperties();
+        appendProperties(properties, sb);
+        sb.append(NEW_LINE);
+
+        final Map<String, String> variables = System.getenv();
+        appendVariables(variables, sb);
+
+        throw new IllegalStateException(sb.toString());
     }
 
     static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements) {
