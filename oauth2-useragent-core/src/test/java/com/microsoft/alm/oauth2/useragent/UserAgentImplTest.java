@@ -282,12 +282,13 @@ public class UserAgentImplTest {
         Assert.assertEquals(0, commands.size());
     }
 
-    @Test public void determineProvider_Compatible() {
+    @Test public void scanProviders_Compatible() {
         final Provider compatibleProvider = new CompatibleProvider();
         //noinspection ArraysAsListWithZeroOrOneArgument
         final List<Provider> providers = Arrays.asList(compatibleProvider);
+        final LinkedHashMap<Provider, List<String>> unmetReqs = new LinkedHashMap<Provider, List<String>>();
 
-        final Provider actual = UserAgentImpl.determineProvider(null, providers);
+        final Provider actual = UserAgentImpl.scanProviders(null, providers, unmetReqs);
 
         Assert.assertEquals(compatibleProvider, actual);
     }
