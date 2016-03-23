@@ -118,6 +118,10 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public Map<Provider, List<String>> getUnmetProviderRequirements() {
+        if (!hasScannedAtLeastOnce) {
+            findCompatibleProvider();
+        }
+
         final Map<Provider, List<String>> copy = new LinkedHashMap<Provider, List<String>>(requirementsByProvider);
         final Map<Provider, List<String>> result = Collections.unmodifiableMap(copy);
         return result;
