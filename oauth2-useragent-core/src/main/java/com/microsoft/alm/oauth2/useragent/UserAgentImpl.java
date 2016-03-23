@@ -84,14 +84,16 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     }
 
     private final TestableProcessFactory processFactory;
+    private final List<Provider> candidateProviders;
     private Provider provider;
 
     public UserAgentImpl() {
-        this(new DefaultProcessFactory(), null);
+        this(new DefaultProcessFactory(), null, Provider.PROVIDERS);
     }
 
-    UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider) {
+    UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider, final List<Provider> candidateProviders) {
         this.processFactory = processFactory;
+        this.candidateProviders = candidateProviders;
         this.provider = provider;
     }
 

@@ -73,7 +73,7 @@ public class UserAgentImplTest {
                 return process;
             }
         };
-        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE, null);
 
         final AuthorizationResponse actual = cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
 
@@ -93,7 +93,7 @@ public class UserAgentImplTest {
                 return process;
             }
         };
-        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE, null);
 
         try {
             cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
