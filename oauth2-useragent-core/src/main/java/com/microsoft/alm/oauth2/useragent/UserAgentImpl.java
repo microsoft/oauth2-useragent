@@ -105,7 +105,9 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public Provider findCompatibleProvider(final String userAgentProvider) {
-        return null;
+        requirementsByProvider.clear();
+        provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider);
+        return provider;
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -43,6 +44,35 @@ public class UserAgentImplTest {
                 "code=AAABAAAAiL9Kn2Z27UubvWFPbm0gLSXKVsoCQ5SqteFtDHVxXA8fd44gIaK71" +
                 "juLqGyAA&session_state=10f521b6-41a9-41ba-8faa-8645e74d5123";
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test public void findCompatibleProvider_atLeastOneCompatible() throws Exception {
+        final Provider compatibleProvider = new CompatibleProvider();
+        final Provider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = Arrays.asList(incompatibleProvider, compatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
+    }
+
+    @Test public void findCompatibleProvider_onlyIncompatible() throws Exception {
+        final Provider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = Collections.singletonList(incompatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(null, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
     }
 
     @Test public void decode_requestAuthorizationCode() throws AuthorizationException, UnsupportedEncodingException {
