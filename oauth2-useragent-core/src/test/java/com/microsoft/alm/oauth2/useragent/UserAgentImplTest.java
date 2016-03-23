@@ -65,6 +65,31 @@ public class UserAgentImplTest {
         Assert.assertEquals(1, incompatibleProvider.getCheckCount());
     }
 
+    @Test public void findCompatibleProvider_atLeastOneCompatible_checkOnlyOnce() throws Exception {
+        final CompatibleProvider compatibleProvider = new CompatibleProvider();
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
+        providers.add(compatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
+
+        final Provider actual2 = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual2);
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
+    }
+
     @Test public void findCompatibleProvider_onlyIncompatible() throws Exception {
         final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
         final List<Provider> providers = new ArrayList<Provider>();
