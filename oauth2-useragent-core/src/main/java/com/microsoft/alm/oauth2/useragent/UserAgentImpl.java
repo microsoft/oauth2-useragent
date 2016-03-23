@@ -152,9 +152,9 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
+        findCompatibleProvider();
         if (provider == null) {
-            final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
-            provider = determineProvider(userAgentProvider);
+            throwUnsupported(requirementsByProvider);
         }
         provider.augmentProcessParameters(command, classPath);
 
@@ -207,21 +207,6 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final String[] classPathComponents = classPath.toArray(EMPTY_STRING_ARRAY);
         final String classPathString = StringHelper.join(pathSeparator, classPathComponents);
         command.add(classPathString);
-    }
-
-    static Provider determineProvider(final String userAgentProvider) {
-        return determineProvider(userAgentProvider, Provider.PROVIDERS);
-    }
-
-    static Provider determineProvider(final String userAgentProvider, final List<Provider> providers) {
-
-        final Map<Provider, List<String>> unmetRequirements = new LinkedHashMap<Provider, List<String>>();
-        final Provider result = scanProviders(userAgentProvider, providers, unmetRequirements);
-
-        if (result == null) {
-            throwUnsupported(unmetRequirements);
-        }
-        return result;
     }
 
     static void throwUnsupported(final Map<Provider, List<String>> unmetRequirements) {
