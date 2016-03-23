@@ -102,7 +102,8 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public Provider findCompatibleProvider() {
-        return null;
+        final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
+        return findCompatibleProvider(userAgentProvider);
     }
 
     @Override
@@ -129,12 +130,14 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     @Override
     public boolean hasCompatibleProvider() {
-        return false;
+        findCompatibleProvider();
+        return provider != null;
     }
 
     @Override
     public boolean hasCompatibleProvider(final String userAgentProvider) {
-        return false;
+        findCompatibleProvider(userAgentProvider);
+        return provider != null;
     }
 
     @Override
