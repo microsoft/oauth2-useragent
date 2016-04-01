@@ -103,14 +103,18 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     @Override
     public Provider findCompatibleProvider() {
         final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
-        return findCompatibleProvider(userAgentProvider);
+        return findCompatibleProvider(userAgentProvider, true);
     }
 
     @Override
     public Provider findCompatibleProvider(final String userAgentProvider) {
+        return findCompatibleProvider(userAgentProvider, true);
+    }
+
+    Provider findCompatibleProvider(final String userAgentProvider, final boolean checkOverrideIsCompatible) {
         if (provider == null || !StringHelper.equal(this.userAgentProvider, userAgentProvider)) {
             requirementsByProvider.clear();
-            provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider);
+            provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider, checkOverrideIsCompatible);
             hasScannedAtLeastOnce = true;
             this.userAgentProvider = userAgentProvider;
         }
@@ -152,7 +156,8 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
-        findCompatibleProvider();
+        final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
+        findCompatibleProvider(userAgentProvider, false);
         if (provider == null) {
             throwUnsupported(requirementsByProvider);
         }
@@ -228,14 +233,22 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         throw new IllegalStateException(sb.toString());
     }
 
-    static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements) {
+    static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements, final boolean checkOverrideIsCompatible) {
 
         Provider result = null;
 
         if (userAgentProvider != null) {
             for (final Provider provider : providers) {
                 if (provider.getClassName().equals(userAgentProvider)) {
-                    result = provider;
+                    if (checkOverrideIsCompatible) {
+                        final List<String> requirements = provider.checkRequirements();
+                        if (requirements == null || requirements.size() == 0) {
+                            result = provider;
+                        }
+                    }
+                    else {
+                        result = provider;
+                    }
                     break;
                 }
             }

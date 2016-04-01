@@ -288,7 +288,7 @@ public class UserAgentImplTest {
         final List<Provider> providers = Arrays.asList(compatibleProvider);
         final LinkedHashMap<Provider, List<String>> unmetReqs = new LinkedHashMap<Provider, List<String>>();
 
-        final Provider actual = UserAgentImpl.scanProviders(null, providers, unmetReqs);
+        final Provider actual = UserAgentImpl.scanProviders(null, providers, unmetReqs, true);
 
         Assert.assertEquals(compatibleProvider, actual);
     }
@@ -330,7 +330,7 @@ public class UserAgentImplTest {
         final List<Provider> providers = Arrays.asList(incompatibleProvider);
         final LinkedHashMap<Provider, List<String>> unmetMap = new LinkedHashMap<Provider, List<String>>();
 
-        final Provider actualProvider = UserAgentImpl.scanProviders(null, providers, unmetMap);
+        final Provider actualProvider = UserAgentImpl.scanProviders(null, providers, unmetMap, true);
 
         Assert.assertEquals(null, actualProvider);
         Assert.assertEquals(1, unmetMap.size());
