@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -43,6 +44,66 @@ public class UserAgentImplTest {
                 "code=AAABAAAAiL9Kn2Z27UubvWFPbm0gLSXKVsoCQ5SqteFtDHVxXA8fd44gIaK71" +
                 "juLqGyAA&session_state=10f521b6-41a9-41ba-8faa-8645e74d5123";
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test public void findCompatibleProvider_atLeastOneCompatible() throws Exception {
+        final CompatibleProvider compatibleProvider = new CompatibleProvider();
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
+        providers.add(compatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
+    }
+
+    @Test public void findCompatibleProvider_atLeastOneCompatible_checkOnlyOnce() throws Exception {
+        final CompatibleProvider compatibleProvider = new CompatibleProvider();
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
+        providers.add(compatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
+
+        final Provider actual2 = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(compatibleProvider, actual2);
+        Assert.assertEquals(1, compatibleProvider.getCheckCount());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
+    }
+
+    @Test public void findCompatibleProvider_onlyIncompatible() throws Exception {
+        final IncompatibleProvider incompatibleProvider = new IncompatibleProvider();
+        final List<Provider> providers = new ArrayList<Provider>();
+        providers.add(incompatibleProvider);
+        final UserAgentImpl cut = new UserAgentImpl(null, null, providers);
+
+        final Provider actual = cut.findCompatibleProvider(null);
+
+        Assert.assertEquals(null, actual);
+        final Map<Provider, List<String>> actualMap = cut.getUnmetProviderRequirements();
+        Assert.assertEquals(1, actualMap.size());
+        final List<String> unmetRequirements = actualMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
+        Assert.assertEquals(1, incompatibleProvider.getCheckCount());
     }
 
     @Test public void decode_requestAuthorizationCode() throws AuthorizationException, UnsupportedEncodingException {
@@ -73,7 +134,7 @@ public class UserAgentImplTest {
                 return process;
             }
         };
-        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE, null);
 
         final AuthorizationResponse actual = cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
 
@@ -93,7 +154,7 @@ public class UserAgentImplTest {
                 return process;
             }
         };
-        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE);
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE, null);
 
         try {
             cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
@@ -221,40 +282,67 @@ public class UserAgentImplTest {
         Assert.assertEquals(0, commands.size());
     }
 
-    @Test public void determineProvider_Compatible() {
+    @Test public void scanProviders_Compatible() {
         final Provider compatibleProvider = new CompatibleProvider();
         //noinspection ArraysAsListWithZeroOrOneArgument
         final List<Provider> providers = Arrays.asList(compatibleProvider);
+        final LinkedHashMap<Provider, List<String>> unmetReqs = new LinkedHashMap<Provider, List<String>>();
 
-        final Provider actual = UserAgentImpl.determineProvider(null, providers);
+        final Provider actual = UserAgentImpl.scanProviders(null, providers, unmetReqs, true);
 
         Assert.assertEquals(compatibleProvider, actual);
     }
 
-    private static class CompatibleProvider extends Provider {
-        public CompatibleProvider() {
-            super("Compatible");
+    private static abstract class TestHelperProvider extends Provider {
+        private int checkCount = 0;
+
+        TestHelperProvider(final String className) {
+            super(className);
         }
 
         @Override public List<String> checkRequirements() {
-            return Collections.emptyList();
+            checkCount++;
+            return null;
+        }
+
+        public int getCheckCount() {
+            return checkCount;
         }
 
         @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
         }
     }
 
-    @Test public void determineProvider_Incompatible() throws IOException {
+    private static class CompatibleProvider extends TestHelperProvider {
+        public CompatibleProvider() {
+            super("Compatible");
+        }
+
+        @Override public List<String> checkRequirements() {
+            super.checkRequirements();
+            return Collections.emptyList();
+        }
+    }
+
+    @Test public void scanProvidersAndThrowUnsupported_Incompatible() throws IOException {
         final Provider incompatibleProvider = new IncompatibleProvider();
         //noinspection ArraysAsListWithZeroOrOneArgument
         final List<Provider> providers = Arrays.asList(incompatibleProvider);
+        final LinkedHashMap<Provider, List<String>> unmetMap = new LinkedHashMap<Provider, List<String>>();
+
+        final Provider actualProvider = UserAgentImpl.scanProviders(null, providers, unmetMap, true);
+
+        Assert.assertEquals(null, actualProvider);
+        Assert.assertEquals(1, unmetMap.size());
+        final List<String> unmetRequirements = unmetMap.get(incompatibleProvider);
+        Assert.assertEquals(3, unmetRequirements.size());
 
         try {
-            UserAgentImpl.determineProvider(null, providers);
+            UserAgentImpl.throwUnsupported(unmetMap);
         }
         catch (final IllegalStateException e) {
-            final String actual = e.getMessage();
-            final StringReader sr = new StringReader(actual);
+            final String actualMessage = e.getMessage();
+            final StringReader sr = new StringReader(actualMessage);
             try {
                 final BufferedReader br = new BufferedReader(sr);
                 Assert.assertEquals("I don't support your platform yet.", br.readLine());
@@ -291,7 +379,7 @@ public class UserAgentImplTest {
         Assert.fail("An IllegalStateException should have been thrown");
     }
 
-    private static class IncompatibleProvider extends Provider {
+    private static class IncompatibleProvider extends TestHelperProvider {
         private static final List<String> MISSING_PREREQUISITES = Arrays.asList(
                 "You must construct additional Pylons.",
                 "You have not enough minerals.",
@@ -302,10 +390,8 @@ public class UserAgentImplTest {
         }
 
         @Override public List<String> checkRequirements() {
+            super.checkRequirements();
             return MISSING_PREREQUISITES;
-        }
-
-        @Override public void augmentProcessParameters(List<String> command, List<String> classPath) {
         }
     }
 }

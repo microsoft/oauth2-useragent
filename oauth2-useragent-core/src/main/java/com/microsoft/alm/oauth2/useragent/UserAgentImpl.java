@@ -8,6 +8,7 @@ import com.microsoft.alm.oauth2.useragent.subprocess.ProcessCoordinator;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcess;
 import com.microsoft.alm.oauth2.useragent.subprocess.TestableProcessFactory;
 import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
+import com.microsoft.alm.oauth2.useragent.utils.StringHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,12 +26,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class UserAgentImpl implements UserAgent {
+public class UserAgentImpl implements UserAgent, ProviderScanner {
 
     static final String REQUEST_AUTHORIZATION_CODE = "requestAuthorizationCode";
     static final String JAVA_VERSION_STRING = System.getProperty("java.version");
@@ -38,6 +40,7 @@ public class UserAgentImpl implements UserAgent {
     static final String PATH_SEPARATOR = System.getProperty("path.separator");
     static final String NEW_LINE = System.getProperty("line.separator");
     static final String UTF_8 = "UTF-8";
+    static final String USER_AGENT_PROVIDER_PROPERTY_NAME = "userAgentProvider";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     private static final Set<String> NETWORKING_PROPERTY_NAMES;
@@ -81,15 +84,64 @@ public class UserAgentImpl implements UserAgent {
     }
 
     private final TestableProcessFactory processFactory;
+    private final List<Provider> candidateProviders;
+    private final LinkedHashMap<Provider, List<String>> requirementsByProvider = new LinkedHashMap<Provider, List<String>>();
     private Provider provider;
+    private boolean hasScannedAtLeastOnce = false;
+    private String userAgentProvider = null;
 
     public UserAgentImpl() {
-        this(new DefaultProcessFactory(), null);
+        this(new DefaultProcessFactory(), null, Provider.PROVIDERS);
     }
 
-    UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider) {
+    UserAgentImpl(final TestableProcessFactory processFactory, final Provider provider, final List<Provider> candidateProviders) {
         this.processFactory = processFactory;
+        this.candidateProviders = candidateProviders;
         this.provider = provider;
+    }
+
+    @Override
+    public Provider findCompatibleProvider() {
+        final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
+        return findCompatibleProvider(userAgentProvider, true);
+    }
+
+    @Override
+    public Provider findCompatibleProvider(final String userAgentProvider) {
+        return findCompatibleProvider(userAgentProvider, true);
+    }
+
+    Provider findCompatibleProvider(final String userAgentProvider, final boolean checkOverrideIsCompatible) {
+        if (provider == null || !StringHelper.equal(this.userAgentProvider, userAgentProvider)) {
+            requirementsByProvider.clear();
+            provider = scanProviders(userAgentProvider, candidateProviders, requirementsByProvider, checkOverrideIsCompatible);
+            hasScannedAtLeastOnce = true;
+            this.userAgentProvider = userAgentProvider;
+        }
+        return provider;
+    }
+
+    @Override
+    public Map<Provider, List<String>> getUnmetProviderRequirements() {
+        if (!hasScannedAtLeastOnce) {
+            findCompatibleProvider();
+        }
+
+        final Map<Provider, List<String>> copy = new LinkedHashMap<Provider, List<String>>(requirementsByProvider);
+        final Map<Provider, List<String>> result = Collections.unmodifiableMap(copy);
+        return result;
+    }
+
+    @Override
+    public boolean hasCompatibleProvider() {
+        findCompatibleProvider();
+        return provider != null;
+    }
+
+    @Override
+    public boolean hasCompatibleProvider(final String userAgentProvider) {
+        findCompatibleProvider(userAgentProvider);
+        return provider != null;
     }
 
     @Override
@@ -104,9 +156,10 @@ public class UserAgentImpl implements UserAgent {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
+        final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
+        findCompatibleProvider(userAgentProvider, false);
         if (provider == null) {
-            final String userAgentProvider = System.getProperty("userAgentProvider");
-            provider = determineProvider(userAgentProvider);
+            throwUnsupported(requirementsByProvider);
         }
         provider.augmentProcessParameters(command, classPath);
 
@@ -157,56 +210,13 @@ public class UserAgentImpl implements UserAgent {
         command.add("-classpath");
         //noinspection ToArrayCallWithZeroLengthArrayArgument
         final String[] classPathComponents = classPath.toArray(EMPTY_STRING_ARRAY);
-        final String classPathString = join(pathSeparator, classPathComponents);
+        final String classPathString = StringHelper.join(pathSeparator, classPathComponents);
         command.add(classPathString);
     }
 
-    static String join(final String separator, final String[] value)
-    {
-        if (value == null)
-            throw new IllegalArgumentException("value is null");
-
-        // "If separator is null, an empty string (String.Empty) is used instead."
-        final String sep = separator == null ? "" : separator;
-
-        final StringBuilder result = new StringBuilder();
-
-        if (value.length > 0) {
-            result.append(value[0] == null ? "" : value[0]);
-            for (int i = 1; i < value.length; i++) {
-                result.append(sep);
-                result.append(value[i] == null ? "" : value[i]);
-            }
-        }
-
-        return result.toString();
-    }
-
-    static Provider determineProvider(final String userAgentProvider) {
-        return determineProvider(userAgentProvider, Provider.PROVIDERS);
-    }
-
-    static Provider determineProvider(final String userAgentProvider, final List<Provider> providers) {
-
-        if (userAgentProvider != null) {
-            for (final Provider provider : providers) {
-                if (provider.getClassName().equals(userAgentProvider)) {
-                    return provider;
-                }
-            }
-        }
+    static void throwUnsupported(final Map<Provider, List<String>> unmetRequirements) {
         final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
-        for (final Provider provider : providers) {
-            final List<String> requirements = provider.checkRequirements();
-            if (requirements == null || requirements.size() == 0) {
-                return provider;
-            }
-            sb.append(NEW_LINE);
-            sb.append("Unmet requirements for the '").append(provider.getClassName()).append("' provider:").append(NEW_LINE);
-            for (final String requirement : requirements) {
-                sb.append(" - ").append(requirement).append(NEW_LINE);
-            }
-        }
+        describeUnmetRequirements(unmetRequirements, sb);
         sb.append(NEW_LINE);
         sb.append("Please send details about your operating system version, Java version, 32- vs. 64-bit, etc.");
         sb.append(NEW_LINE);
@@ -221,6 +231,56 @@ public class UserAgentImpl implements UserAgent {
         appendVariables(variables, sb);
 
         throw new IllegalStateException(sb.toString());
+    }
+
+    static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements, final boolean checkOverrideIsCompatible) {
+
+        Provider result = null;
+
+        if (userAgentProvider != null) {
+            for (final Provider provider : providers) {
+                if (provider.getClassName().equals(userAgentProvider)) {
+                    if (checkOverrideIsCompatible) {
+                        final List<String> requirements = provider.checkRequirements();
+                        if (requirements == null || requirements.size() == 0) {
+                            result = provider;
+                        }
+                    }
+                    else {
+                        result = provider;
+                    }
+                    break;
+                }
+            }
+        }
+
+        for (final Provider provider : providers) {
+            final List<String> requirements = provider.checkRequirements();
+            if (requirements == null || requirements.size() == 0) {
+                if (result == null) {
+                    result = provider;
+                }
+            }
+            else {
+                destinationUnmetRequirements.put(provider, requirements);
+            }
+        }
+
+        return result;
+    }
+
+    static void describeUnmetRequirements(final Map<Provider, List<String>> unmetRequirements, final StringBuilder destination) {
+        for (final Map.Entry<Provider, List<String>> pair: unmetRequirements.entrySet()) {
+            final Provider provider = pair.getKey();
+            final List<String> requirements = pair.getValue();
+            if (requirements != null && requirements.size() > 0) {
+                destination.append(NEW_LINE);
+                destination.append("Unmet requirements for the '").append(provider.getClassName()).append("' provider:").append(NEW_LINE);
+                for (final String requirement : requirements) {
+                    destination.append(" - ").append(requirement).append(NEW_LINE);
+                }
+            }
+        }
     }
 
     static void appendProperties(final Properties properties, final StringBuilder destination) {
