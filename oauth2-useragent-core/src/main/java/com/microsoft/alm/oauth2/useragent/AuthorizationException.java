@@ -48,7 +48,16 @@ public class AuthorizationException extends Exception {
     }
 
     @Override public String toString() {
-        return toString(this.code, this.description, this.uri);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getName()).append(": ");
+        sb.append("Code: ").append(code);
+        if (uri != null) {
+            sb.append(" Uri: ").append(uri.toString());
+        }
+        if (description != null) {
+            sb.append(" Description: ").append(description);
+        }
+        return sb.toString();
     }
 
     public static String toString(final String code, final Throwable throwable, final URI uri) {

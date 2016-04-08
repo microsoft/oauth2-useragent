@@ -167,6 +167,75 @@ public class UserAgentImplTest {
         Assert.fail("An AuthorizationException should have been thrown.");
     }
 
+    @Test public void encode_subProcessUnhandledException() throws Exception {
+        final String authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/authorize?resource=foo&client_id=bar&response_type=code&redirect_uri=https%3A//redirect.example.com";
+        final String redirectUri = "https://redirect.example.com";
+        final String stackTrace = "Exception in Application start method\n" +
+                "Exception in Application stop method\n" +
+                "java.lang.reflect.InvocationTargetException\n" +
+                "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n" +
+                "\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n" +
+                "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n" +
+                "\tat java.lang.reflect.Method.invoke(Method.java:497)\n" +
+                "\tat com.sun.javafx.application.LauncherImpl.launchApplicationWithArgs(LauncherImpl.java:389)\n" +
+                "\tat com.sun.javafx.application.LauncherImpl.launchApplication(LauncherImpl.java:328)\n" +
+                "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n" +
+                "\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n" +
+                "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n" +
+                "\tat java.lang.reflect.Method.invoke(Method.java:497)\n" +
+                "\tat sun.launcher.LauncherHelper$FXHelper.main(LauncherHelper.java:767)\n" +
+                "Caused by: java.lang.RuntimeException: Exception in Application start method\n" +
+                "\tat com.sun.javafx.application.LauncherImpl.launchApplication1(LauncherImpl.java:917)\n" +
+                "\tat com.sun.javafx.application.LauncherImpl.lambda$launchApplication$156(LauncherImpl.java:182)\n" +
+                "\tat java.lang.Thread.run(Thread.java:745)\n" +
+                "Caused by: java.lang.UnsatisfiedLinkError: /home/example/jre1.8.0_60/lib/i386/libjfxwebkit.so: libxslt.so.1: cannot open shared object file: No such file or directory\n" +
+                "\tat java.lang.ClassLoader$NativeLibrary.load(Native Method)\n" +
+                "\tat java.lang.ClassLoader.loadLibrary0(ClassLoader.java:1938)\n" +
+                "\tat java.lang.ClassLoader.loadLibrary(ClassLoader.java:1821)\n" +
+                "\tat java.lang.Runtime.load0(Runtime.java:809)\n" +
+                "\tat java.lang.System.load(System.java:1086)\n" +
+                "\tat com.sun.glass.utils.NativeLibLoader.loadLibraryFullPath(NativeLibLoader.java:201)\n" +
+                "\tat com.sun.glass.utils.NativeLibLoader.loadLibraryInternal(NativeLibLoader.java:94)\n" +
+                "\tat com.sun.glass.utils.NativeLibLoader.loadLibrary(NativeLibLoader.java:39)\n" +
+                "\tat com.sun.webkit.WebPage.lambda$static$39(WebPage.java:130)\n" +
+                "\tat java.security.AccessController.doPrivileged(Native Method)\n" +
+                "\tat com.sun.webkit.WebPage.<clinit>(WebPage.java:129)\n" +
+                "\tat javafx.scene.web.WebEngine.<init>(WebEngine.java:858)\n" +
+                "\tat javafx.scene.web.WebEngine.<init>(WebEngine.java:845)\n" +
+                "\tat javafx.scene.web.WebView.<init>(WebView.java:271)\n" +
+                "\tat com.microsoft.alm.oauth2.useragent.InterceptingBrowser.<init>(InterceptingBrowser.java:23)\n" +
+                "\tat com.microsoft.alm.oauth2.useragent.JavaFx.start(JavaFx.java:61)\n" +
+                "\tat com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$163(LauncherImpl.java:863)\n" +
+                "\tat com.sun.javafx.application.PlatformImpl.lambda$runAndWait$176(PlatformImpl.java:326)\n" +
+                "\tat com.sun.javafx.application.PlatformImpl.lambda$null$174(PlatformImpl.java:295)\n" +
+                "\tat java.security.AccessController.doPrivileged(Native Method)\n" +
+                "\tat com.sun.javafx.application.PlatformImpl.lambda$runLater$175(PlatformImpl.java:294)\n" +
+                "\tat com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)\n" +
+                "\tat com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)\n" +
+                "\tat com.sun.glass.ui.gtk.GtkApplication.lambda$null$50(GtkApplication.java:139)\n" +
+                "\t... 1 more\n" +
+                "Exception running application com.microsoft.alm.oauth2.useragent.JavaFx\n";
+        final TestProcess process = new TestProcess("", stackTrace);
+        final TestableProcessFactory processFactory = new TestableProcessFactory() {
+            @Override public TestableProcess create(final String... command) throws IOException {
+                return process;
+            }
+        };
+        final UserAgentImpl cut = new UserAgentImpl(processFactory, TestProvider.INSTANCE, null);
+
+        try {
+            cut.encode(UserAgentImpl.REQUEST_AUTHORIZATION_CODE, authorizationEndpoint, redirectUri);
+        }
+        catch (final AuthorizationException e) {
+            final String expected = "com.microsoft.alm.oauth2.useragent.AuthorizationException: Code: unknown_error Description: " + stackTrace;
+            final String actual = e.toString();
+            assertLinesEqual(actual, expected);
+            Assert.assertEquals("unknown_error", e.getCode());
+            return;
+        }
+        Assert.fail("An AuthorizationException should have been thrown.");
+    }
+
     @Test public void appendProperties_Typical() throws Exception {
         final StringBuilder sb = new StringBuilder();
         final Properties properties = new Properties();

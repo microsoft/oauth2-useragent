@@ -32,7 +32,7 @@ public class AuthorizationResponseTest {
         try {
             AuthorizationResponse.fromString(input);
         } catch (final AuthorizationException actual) {
-            Assert.assertEquals("error=unknown_error", actual.toString());
+            Assert.assertEquals("unknown_error", actual.getCode());
             return;
         }
 
