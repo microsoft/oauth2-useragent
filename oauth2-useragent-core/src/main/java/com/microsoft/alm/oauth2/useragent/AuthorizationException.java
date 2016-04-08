@@ -27,6 +27,9 @@ public class AuthorizationException extends Exception {
 
     public AuthorizationException(final String code, final String description, final URI uri, final Throwable cause) {
         super(code, cause);
+        if (code == null) {
+            throw new IllegalArgumentException("The 'code' argument cannot be null.");
+        }
         this.code = code;
         this.description = description;
         this.uri = uri;
