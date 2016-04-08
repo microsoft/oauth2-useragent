@@ -223,6 +223,11 @@ public class UserAgentImplTest {
         );
     }
 
+    private static void assertLinesEqual(final String actual, final String expected) {
+        final String[] expectedLines = expected.split("\\n");
+        assertLinesEqual(actual, expectedLines);
+    }
+
     private static void assertLinesEqual(final String actual, final String... expectedLines) {
         final StringReader sr = new StringReader(actual);
         try {
