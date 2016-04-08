@@ -27,6 +27,9 @@ public class AuthorizationException extends Exception {
 
     public AuthorizationException(final String code, final String description, final URI uri, final Throwable cause) {
         super(code, cause);
+        if (code == null) {
+            throw new IllegalArgumentException("The 'code' argument cannot be null.");
+        }
         this.code = code;
         this.description = description;
         this.uri = uri;
@@ -45,7 +48,16 @@ public class AuthorizationException extends Exception {
     }
 
     @Override public String toString() {
-        return toString(this.code, this.description, this.uri);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getName()).append(": ");
+        sb.append("Code: ").append(code);
+        if (uri != null) {
+            sb.append(" Uri: ").append(uri.toString());
+        }
+        if (description != null) {
+            sb.append(" Description: ").append(description);
+        }
+        return sb.toString();
     }
 
     public static String toString(final String code, final Throwable throwable, final URI uri) {
