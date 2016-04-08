@@ -348,7 +348,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
             }
         }
         catch (final AuthorizationException e) {
-            printStream.println(e.toString());
+            printStream.println(AuthorizationException.toString(e.getCode(), e.getDescription(), e.getUri()));
         }
         catch (final IOException e) {
             printStream.println(AuthorizationException.toString("io_exception", e.getMessage(), null));
