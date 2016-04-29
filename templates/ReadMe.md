@@ -75,6 +75,7 @@ public class App {
     final UserAgent userAgent = new UserAgentImpl();
 
     final AuthorizationResponse authorizationResponse = userAgent.requestAuthorizationCode(authorizationEndpoint, redirectUri);
+    final String code = authorizationResponse.getCode();
 
     System.out.print("Authorization Code: ");
     System.out.println(code);
