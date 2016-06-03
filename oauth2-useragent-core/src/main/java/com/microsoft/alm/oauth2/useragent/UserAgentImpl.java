@@ -215,6 +215,12 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     }
 
     static void throwUnsupported(final Map<Provider, List<String>> unmetRequirements) {
+        final StringBuilder sb = buildUnsupportedMessage(unmetRequirements);
+
+        throw new IllegalStateException(sb.toString());
+    }
+
+    public static StringBuilder buildUnsupportedMessage(Map<Provider, List<String>> unmetRequirements) {
         final StringBuilder sb = new StringBuilder("I don't support your platform yet.");
         describeUnmetRequirements(unmetRequirements, sb);
         sb.append(NEW_LINE);
@@ -229,8 +235,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
 
         final Map<String, String> variables = System.getenv();
         appendVariables(variables, sb);
-
-        throw new IllegalStateException(sb.toString());
+        return sb;
     }
 
     static Provider scanProviders(final String userAgentProvider, final List<Provider> providers, final Map<Provider, List<String>> destinationUnmetRequirements, final boolean checkOverrideIsCompatible) {
