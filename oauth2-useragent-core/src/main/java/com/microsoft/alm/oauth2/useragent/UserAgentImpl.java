@@ -274,7 +274,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         return result;
     }
 
-    static void describeUnmetRequirements(final Map<Provider, List<String>> unmetRequirements, final StringBuilder destination) {
+    public static void describeUnmetRequirements(final Map<Provider, List<String>> unmetRequirements, final StringBuilder destination) {
         for (final Map.Entry<Provider, List<String>> pair: unmetRequirements.entrySet()) {
             final Provider provider = pair.getKey();
             final List<String> requirements = pair.getValue();
