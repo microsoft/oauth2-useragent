@@ -1,4 +1,4 @@
-Microsoft OAuth 2.0 User Agent library for Java 0.8.1
+Microsoft OAuth 2.0 User Agent library for Java 0.9.0
 ==================================
 Provides classes to facilitate the implementation of "4.1. Authorization Code Grant" from RFC 6749, specifically by auto-detecting a suitable user-agent (and informing the user if any system requirements are unmet and preventing the use of a user-agent), launching the user-agent and directing it to the authorization endpoint, waiting for the results and returning either the authorization code or the reason for failure.
 
@@ -59,7 +59,7 @@ Maven is the preferred way of referencing this library.  Add the following to yo
   <dependency>
     <groupId>com.microsoft.alm</groupId>
     <artifactId>oauth2-useragent</artifactId>
-    <version>0.8.1</version>
+    <version>0.9.0</version>
   </dependency>
 ```
 
