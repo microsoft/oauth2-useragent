@@ -1,6 +1,8 @@
-These notes are for release **0.9.0**.
+These notes are for release **(to be determined)**.
 Other releases and their notes can be found at the [oauth2-useragent GitHub Releases](https://github.com/Microsoft/oauth2-useragent/releases) page.
 
+* Major:
+    * TODO
 * Minor:
-    * Update documentation.  Thanks to @thatsIch for pull request #26.
-    * Expose a few methods in `UserAgentImpl` for re-use outside of the project.  Made possible by pull request #27.
+    * TODO
+
