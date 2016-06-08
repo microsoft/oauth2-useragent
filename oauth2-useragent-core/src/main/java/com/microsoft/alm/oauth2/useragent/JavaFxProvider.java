@@ -82,21 +82,7 @@ class JavaFxProvider extends Provider {
             requirements.add(REQUIREMENTS.get(1));
         }
 
-        boolean hasDesktop = false;
-        if (isWindows(osName)) {
-            // TODO: There's still a chance the user is connected via SSH or on Server Core...
-            hasDesktop = true;
-        }
-        else if (isMac(osName)) {
-            // TODO: There's still a chance the user is connected via SSH...
-            hasDesktop = true;
-        }
-        else if (isLinux(osName)) {
-            if (displayVariable != null) {
-                hasDesktop = true;
-            }
-        }
-        if (!hasDesktop) {
+        if (!hasDesktop(osName, displayVariable)) {
             requirements.add(REQUIREMENTS.get(2));
         }
 
