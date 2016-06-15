@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StandardWidgetToolkitProvider extends Provider {
@@ -66,6 +67,8 @@ public class StandardWidgetToolkitProvider extends Provider {
             classPath.add(swtJar.getAbsolutePath());
         }
 
+        relayProperties(command);
+
         if (isMac(OS_NAME)) {
             command.add("-XstartOnFirstThread");
         }
@@ -110,4 +113,57 @@ public class StandardWidgetToolkitProvider extends Provider {
 
         return swtRuntime;
     }
+
+    static void relayProperties(final List<String> command) {
+        // https://www.eclipse.org/swt/faq.php#browserproxy
+        if (isLinux(OS_NAME)) {
+            relayNetworkProperties(command);
+        }
+
+        // https://www.eclipse.org/swt/faq.php#specifyxulrunner
+        relayProperty(command, "org.eclipse.swt.browser.XULRunnerPath");
+
+        // https://www.eclipse.org/swt/faq.php#specifyprofile
+        relayProperty(command, "org.eclipse.swt.browser.MOZ_PROFILE_PATH");
+    }
+
+    static void relayNetworkProperties(final List<String> command) {
+        // favor https proxy setting over http proxy setting, check for
+        // regular Java property first so user don't have to change
+        // their setting just for SWT
+        final List<String> httpProxyHostProps =
+                Arrays.asList("https.proxyHost", "http.proxyHost", "network.proxy_host");
+        final String proxyHost = getFirstSetProperty(httpProxyHostProps);
+        if (!StringHelper.isNullOrEmpty(proxyHost)) {
+            command.add("-Dnetwork.proxy_host=" + proxyHost);
+        }
+
+        final List<String> httpProxyPortProps =
+                Arrays.asList("https.proxyPort", "http.proxyPort", "network.proxy_port");
+        final String proxyPort = getFirstSetProperty(httpProxyPortProps);
+        if (!StringHelper.isNullOrEmpty(proxyPort)) {
+            command.add("-Dnetwork.proxy_port=" + proxyPort);
+        }
+    }
+
+    static void relayProperty(final List<String> command, final String propertyName) {
+        final String value = System.getProperty(propertyName);
+        if (!StringHelper.isNullOrEmpty(value)) {
+            command.add(String.format("-D%s=%s", propertyName, value));
+        }
+    }
+
+    static String getFirstSetProperty(final List<String> potentials) {
+        String property = null;
+        for (final String name : potentials) {
+            final String value = System.getProperty(name);
+            if (!StringHelper.isNullOrWhiteSpace(value)) {
+                property = value;
+                break;
+            }
+        }
+
+        return property;
+    }
+
 }

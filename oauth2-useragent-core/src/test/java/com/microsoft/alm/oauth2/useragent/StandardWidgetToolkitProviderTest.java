@@ -5,11 +5,15 @@ package com.microsoft.alm.oauth2.useragent;
 
 import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
 import org.eclipse.swt.SWT;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,12 +25,19 @@ import static org.mockito.Mockito.when;
 
 public class StandardWidgetToolkitProviderTest {
 
+    private Properties oldProperties;
+
     private PackageLocator packageLocator = new PackageLocator();
 
     @Before
     public void setUp() throws Exception {
+        oldProperties = (Properties) System.getProperties().clone();
+    }
+
+    @After
+    public void tearDown() throws Exception {
         StandardWidgetToolkitProvider.PACKAGE_LOCATOR_OVERRIDE = null;
-        System.setProperty(StandardWidgetToolkitProvider.SWT_RUNTIME_JAR_OVERRIDE, "");
+        System.setProperties(oldProperties);
     }
 
     @Test
@@ -114,5 +125,69 @@ public class StandardWidgetToolkitProviderTest {
         swtJar.delete();
         actualJarFile = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtJar);
         assertNull(actualJarFile);
+    }
+
+    @Test
+    public void relayJavaStandardNetworkProxySettings() {
+        System.setProperty("network.proxy_host", "127.0.0.1");
+        System.setProperty("network.proxy_port", "1111");
+
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "3333");
+
+        final List<String> command = new ArrayList<String>();
+        StandardWidgetToolkitProvider.relayNetworkProperties(command);
+
+        // should have two properties for network proxy
+        assertEquals(2, command.size());
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_host=localhost", command));
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_port=3333", command));
+
+        // favor https settings
+        System.setProperty("https.proxyHost", "0.0.0.0");
+        System.setProperty("https.proxyPort", "8888");
+
+        command.clear();
+        StandardWidgetToolkitProvider.relayNetworkProperties(command);
+
+        assertEquals(2, command.size());
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_host=0.0.0.0", command));
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_port=8888", command));
+    }
+
+    @Test
+    public void relaySwtNetworkProxySettings() {
+        System.setProperty("network.proxy_host", "127.0.0.1");
+        System.setProperty("network.proxy_port", "1111");
+
+        final List<String> command = new ArrayList<String>();
+        StandardWidgetToolkitProvider.relayNetworkProperties(command);
+
+        assertEquals(2, command.size());
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_host=127.0.0.1", command));
+        assertTrue(hasExpectedOption("-Dnetwork.proxy_port=1111", command));
+    }
+
+    @Test
+    public void relaySwtBrowserSettings() {
+        System.setProperty("org.eclipse.swt.browser.XULRunnerPath", "/a/b/c");
+        System.setProperty("org.eclipse.swt.browser.MOZ_PROFILE_PATH", "/d/e/f");
+
+        final List<String> command = new ArrayList<String>();
+        StandardWidgetToolkitProvider.relayProperties(command);
+
+        assertEquals(2, command.size());
+        assertTrue(hasExpectedOption("-Dorg.eclipse.swt.browser.XULRunnerPath=/a/b/c", command));
+        assertTrue(hasExpectedOption("-Dorg.eclipse.swt.browser.MOZ_PROFILE_PATH=/d/e/f", command));
+    }
+
+    private boolean hasExpectedOption(final String expected, final List<String> command) {
+        for (final String s : command) {
+            if (s.equals(expected)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
