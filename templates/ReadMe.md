@@ -26,12 +26,12 @@ The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authori
 </ol>
 
 ### Available user agents and their requirements
-The following table summarizes the current and planned support for user agents.
+The following table summarizes the current support for user agents.
 
 | Provider | Minimum Java Version | Requires desktop? | Requires 3rd-party dependency | Notes |
 |--------------------------|------------------------|-------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | JavaFX | Oracle Java 7 Update 6 (:warning:) | Yes | No | Uses WebView and WebEngine.  JavaFx ships with Oracle's Java since version 7 Update 6.  OpenJDK 8 users can [build & install OpenJFX](https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX). <br />:warning: Mac OS X 10.11 (El Capitan) and greater only work with Oracle Java 8, because it looks like [Java FX is broken on Mac OS X 10.11](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8143907). |
-| SWT (planned) | 1.6 | Yes | Yes | This will use the Standard Widget Toolkit from the Eclipse project, which will require the client either ship with the SWT JAR(s) or download them on-demand. |
+| StandardWidgetToolkit | 1.6 | Yes | Yes | Uses the Standard Widget Toolkit (SWT) from the Eclipse project, which requires the client either ship with the SWT JAR(s) or download them on-demand. This provider will first look in the CLASSPATH for SWT, then look for `$HOME/.swt/swt-${arch}.jar`, where $HOME represents the user's home directory and ${arch} is either `x86` or `x86_64`, depending on the JVM.  The path to the JAR can also be overridden with the `SWT_RUNTIME_JAR_PATH` property.  Please refer to [The SWT FAQ](https://www.eclipse.org/swt/faq.php) for additional information on compatibility and options related to the SWT browser. |
 
 
 Why would I want to use this library?
