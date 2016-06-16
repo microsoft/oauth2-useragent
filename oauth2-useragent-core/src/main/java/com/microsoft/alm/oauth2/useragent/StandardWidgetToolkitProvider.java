@@ -41,6 +41,10 @@ public class StandardWidgetToolkitProvider extends Provider {
         super("StandardWidgetToolkit");
     }
 
+    public static String getDefaultSwtJarPath() {
+        return DEFAULT_SWT_RUNTIME_JAR.getAbsolutePath();
+    }
+
     @Override
     public List<String> checkRequirements() {
         final List<String> requirements = new ArrayList<String>();
