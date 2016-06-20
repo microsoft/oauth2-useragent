@@ -18,9 +18,11 @@ public abstract class Provider {
     static final String ENV_DISPLAY = System.getenv("DISPLAY");
 
     public static final Provider JAVA_FX = new JavaFxProvider();
+    public static final Provider STANDARD_WIDGET_TOOLKIT = new StandardWidgetToolkitProvider();
 
     public static final List<Provider> PROVIDERS = Collections.unmodifiableList(Arrays.asList(
-            JAVA_FX
+            JAVA_FX,
+            STANDARD_WIDGET_TOOLKIT
     ));
 
     private final String className;

@@ -52,11 +52,13 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <swt.version>4.4.2</swt.version>
   </properties>
 
   <modules>
     <module>oauth2-useragent-core</module>
     <module>oauth2-useragent-javafx</module>
+    <module>oauth2-useragent-swt</module>
     <!-- The following module MUST go after core and the providers -->
     <module>oauth2-useragent</module>
     <module>oauth2-useragent-tester</module>
@@ -79,6 +81,11 @@
       <dependency>
         <groupId>com.microsoft.alm</groupId>
         <artifactId>oauth2-useragent-javafx</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.alm</groupId>
+        <artifactId>oauth2-useragent-swt</artifactId>
         <version>${project.version}</version>
       </dependency>
 

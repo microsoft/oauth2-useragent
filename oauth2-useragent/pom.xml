@@ -60,6 +60,13 @@
           <include>**</include>
         </includes>
       </resource>
+      <resource>
+        <directory>${project.basedir}/../oauth2-useragent-swt/target/classes</directory>
+        <targetPath>./</targetPath>
+        <includes>
+          <include>**</include>
+        </includes>
+      </resource>
     </resources>
 
     <plugins>
@@ -146,7 +153,7 @@
               <additionalparam>-quiet</additionalparam>
               <attach>true</attach>
               <skip>false</skip>
-              <sourcepath>${project.basedir}/../oauth2-useragent-core/src/main/java;${project.basedir}/../oauth2-useragent-javafx/src/main/java</sourcepath>
+              <sourcepath>${project.basedir}/../oauth2-useragent-core/src/main/java;${project.basedir}/../oauth2-useragent-javafx/src/main/java;${project.basedir}/../oauth2-useragent-swt/src/main/java</sourcepath>
             </configuration>
           </plugin>
           <plugin>
