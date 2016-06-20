@@ -32,7 +32,6 @@ The following table summarizes the current and planned support for user agents.
 |--------------------------|------------------------|-------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | JavaFX | Oracle Java 7 Update 6 (:warning:) | Yes | No | Uses WebView and WebEngine.  JavaFx ships with Oracle's Java since version 7 Update 6.  OpenJDK 8 users can [build & install OpenJFX](https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX). <br />:warning: Mac OS X 10.11 (El Capitan) and greater only work with Oracle Java 8, because it looks like [Java FX is broken on Mac OS X 10.11](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8143907). |
 | SWT (planned) | 1.6 | Yes | Yes | This will use the Standard Widget Toolkit from the Eclipse project, which will require the client either ship with the SWT JAR(s) or download them on-demand. |
-| Device profile (planned) | 1.6 | No | No | For when a web browser isn't available, another device can be used to authenticate.  Preview blog post: [New ADAL 3.x preview–device profile, Linux and OS X sample](http://www.cloudidentity.com/blog/2015/12/02/new-adal-3-x-previewdevice-profile-linux-and-os-x-sample/) |
 
 
 Why would I want to use this library?
