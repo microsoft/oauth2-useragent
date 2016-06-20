@@ -16,12 +16,12 @@ import javafx.stage.Stage;
 import java.net.URI;
 import java.util.List;
 
-public class JavaFx extends Application implements UserAgent, Runnable, RunnableFactory {
+public class JavaFx extends Application implements UserAgent, Runnable, RunnableFactory<JavaFx> {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
-    static RunnableFactory RUNNABLE_FACTORY_OVERRIDE = null;
+    static RunnableFactory<JavaFx> RUNNABLE_FACTORY_OVERRIDE = null;
 
-    private final RunnableFactory runnableFactory;
+    private final RunnableFactory<JavaFx> runnableFactory;
     private InterceptingBrowser interceptingBrowser = null;
 
     public static void main(final String[] args) {

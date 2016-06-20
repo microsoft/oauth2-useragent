@@ -3,6 +3,6 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
-public interface RunnableFactory {
-    Runnable create(final JavaFx javaFx);
+public interface RunnableFactory<T extends UserAgent> {
+    Runnable create(final T t);
 }

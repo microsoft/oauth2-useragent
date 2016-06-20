@@ -78,7 +78,7 @@ public class JavaFxTest {
     @Test public void nullPointerException() {
         expectedExceptionRef.set(new NullPointerException());
         final String[] args = {UserAgentImpl.REQUEST_AUTHORIZATION_CODE};
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory() {
+        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<JavaFx>() {
             public Runnable create(final JavaFx javaFx) {
                 return new Runnable() {
                     public void run() {
@@ -109,7 +109,7 @@ public class JavaFxTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html")));
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory() {
+        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<JavaFx>() {
             public Runnable create(final JavaFx javaFx) {
                 return new Runnable() {
                     public void run() {
