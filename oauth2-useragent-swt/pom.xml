@@ -16,13 +16,6 @@
 
   <name>Eclipse SWT provider for Microsoft OAuth 2.0 User Agent library for Java</name>
 
-  <repositories>
-    <repository>
-      <id>maven-eclipse-repo</id>
-      <url>http://maven-eclipse.github.io/maven</url>
-    </repository>
-  </repositories>
-
   <properties>
     <!-- The following properties are set during the "initialize" phase by some Groovy code below.
     They must not be present in this element, even if the IDE says their use can't be resolved.

@@ -66,6 +66,13 @@
     <module>oauth2-useragent-dummy</module>
   </modules>
 
+  <repositories>
+    <repository>
+      <id>maven-eclipse-repo</id>
+      <url>http://maven-eclipse.github.io/maven</url>
+    </repository>
+  </repositories>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
