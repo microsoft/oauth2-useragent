@@ -84,4 +84,13 @@ public class StandardWidgetToolkit implements UserAgent, RunnableFactory<Standar
         }
         display.dispose();
     }
+
+    void dispose() {
+        this.display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                shell.dispose();
+            }
+        });
+    }
 }
