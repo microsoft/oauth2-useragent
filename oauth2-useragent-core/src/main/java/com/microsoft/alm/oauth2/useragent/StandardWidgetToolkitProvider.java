@@ -3,19 +3,38 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
+import com.microsoft.alm.oauth2.useragent.utils.StringHelper;
+import org.eclipse.swt.SWT;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StandardWidgetToolkitProvider extends Provider {
+
+    public static final String SWT_RUNTIME_JAR_OVERRIDE = "SWT_RUNTIME_JAR_PATH";
+
+    private static final File SWT_HOME = new File(USER_HOME, ".swt");
+    private static final String SWT_JAR_NAME = getSwtRuntimeJarName();
+
+    private static final File DEFAULT_SWT_RUNTIME_JAR = new File(SWT_HOME, SWT_JAR_NAME);
+
     private static final String JAVA_VERSION_REQUIREMENT = "Oracle Java SE or OpenJDK, version 6 and higher";
-    private static final String ECLIPSE_SWT_RUNTIME_REQUIREMENT = "Standard Widget Toolkit Runtime JAR in $(HOME)/.swt/swt.jar.";
+    private static final String ECLIPSE_SWT_RUNTIME_REQUIREMENT = "Standard Widget Toolkit Runtime at " +
+            DEFAULT_SWT_RUNTIME_JAR;
+
     private static final String GUI_DESKTOP_ENVIRONMENT_REQUIREMENT = "A desktop environment.";
 
-    private static final File[] potentialSwtJarLocations = new File[]{
-            new File(USER_HOME, ".swt/swt.jar"),
-            new File(JAVA_IO_TMPDIR, "swt.jar"),
-    };
+    private static final PackageLocator packageLocator = new PackageLocator();
+
+    static PackageLocator PACKAGE_LOCATOR_OVERRIDE = null;
+
+    static String getSwtRuntimeJarName() {
+        final String swtRuntimeFormatter = "swt-%s.jar";
+        final String swtArch = OS_ARCH.contains("64") ? "x86_64" : "x86";
+        return String.format(swtRuntimeFormatter, swtArch);
+    }
 
     protected StandardWidgetToolkitProvider() {
         super("StandardWidgetToolkit");
@@ -29,7 +48,7 @@ public class StandardWidgetToolkitProvider extends Provider {
             requirements.add(JAVA_VERSION_REQUIREMENT);
         }
 
-        if (getSwtRuntimeJar(potentialSwtJarLocations) == null) {
+        if (getSwtRuntimeJar(DEFAULT_SWT_RUNTIME_JAR) == null) {
             requirements.add(ECLIPSE_SWT_RUNTIME_REQUIREMENT);
         }
 
@@ -42,7 +61,7 @@ public class StandardWidgetToolkitProvider extends Provider {
 
     @Override
     public void augmentProcessParameters(final List<String> command, final List<String> classPath) {
-        final File swtJar = getSwtRuntimeJar(potentialSwtJarLocations);
+        final File swtJar = getSwtRuntimeJar(DEFAULT_SWT_RUNTIME_JAR);
         if (swtJar != null) {
             classPath.add(swtJar.getAbsolutePath());
         }
@@ -60,13 +79,35 @@ public class StandardWidgetToolkitProvider extends Provider {
                 || (javaMajorVersion == 1 && javaMinorVersion >= 6);
     }
 
-    static File getSwtRuntimeJar(final File[] possibleSwtJars) {
-        for (final File potentialSwtJar : possibleSwtJars) {
-            if (potentialSwtJar.isFile()) {
-                return potentialSwtJar;
+    static File getSwtRuntimeJar(final File defaultRuntimeJar) {
+        // First we check for SWT override property
+        File swtRuntime = null;
+        final String overrideSwtJarPath = System.getProperty(SWT_RUNTIME_JAR_OVERRIDE);
+        if (!StringHelper.isNullOrWhiteSpace(overrideSwtJarPath)) {
+            final File overrideSwtJar = new File(overrideSwtJarPath);
+            if (overrideSwtJar.isFile()) {
+                swtRuntime = overrideSwtJar;
             }
         }
 
-        return null;
+        // Then check for current classpath and try to locate SWT jar
+        if (swtRuntime == null) {
+            final PackageLocator locator = PACKAGE_LOCATOR_OVERRIDE == null
+                    ? packageLocator
+                    : PACKAGE_LOCATOR_OVERRIDE;
+            try {
+                final File swtClasspathJar = locator.locatePackage(SWT.class);
+                swtRuntime = swtClasspathJar;
+            } catch (NoClassDefFoundError e){
+                //ignored, no SWT jar on classpath
+            }
+        }
+
+        // Lastly fallback to default jar
+        if (swtRuntime == null && defaultRuntimeJar.isFile()) {
+            swtRuntime = defaultRuntimeJar;
+        }
+
+        return swtRuntime;
     }
 }

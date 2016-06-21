@@ -3,17 +3,31 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.utils.PackageLocator;
+import org.eclipse.swt.SWT;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class StandardWidgetToolkitProviderTest {
+
+    private PackageLocator packageLocator = new PackageLocator();
+
+    @Before
+    public void setUp() throws Exception {
+        StandardWidgetToolkitProvider.PACKAGE_LOCATOR_OVERRIDE = null;
+        System.setProperty(StandardWidgetToolkitProvider.SWT_RUNTIME_JAR_OVERRIDE, "");
+    }
 
     @Test
     public void jreRequirementMet_WithJava678() throws Exception {
@@ -61,24 +75,44 @@ public class StandardWidgetToolkitProviderTest {
     }
 
     @Test
-    public void swtRuntimeRequirementMet_ifSwtJarExists() throws IOException {
-        final File[] swtJar = new File[] {
-            File.createTempFile("eclipseSwtProviderExists", "unitTest")
-        };
+    public void swtRuntimeRequirementMet_checkPropertyFirst() throws IOException {
+        final File swtFromProperty = File.createTempFile("propertyPointedSwtJar", "unitTest");
+        final File swtFromClasspath = packageLocator.locatePackage(SWT.class);
+        final File swtDefaultJar = File.createTempFile("defaultFakeSwtJar", "unitTest");
 
-        final File swtRuntime = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtJar);
+        System.setProperty(StandardWidgetToolkitProvider.SWT_RUNTIME_JAR_OVERRIDE, swtFromProperty.getAbsolutePath());
+
+        final File swtRuntime = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtDefaultJar);
         assertNotNull(swtRuntime);
+        assertEquals(swtFromProperty.getAbsolutePath(), swtRuntime.getAbsolutePath());
     }
 
     @Test
-    public void swtRuntimeRequirementNotMet_ifSwtJarDoesNotExists() throws IOException {
-        final File[] swtJar = new File[] {
-            File.createTempFile("eclipseSwtProviderDoesNotExist", "unitTest")
-        };
-        //noinspection ResultOfMethodCallIgnored
-        swtJar[0].delete();
+    public void swtRuntimeRequirementMet_loadFromClasspathBeforeGetDefault() throws IOException {
+        final File swtFromClasspath = packageLocator.locatePackage(SWT.class);
+        final File swtDefaultJar = File.createTempFile("defaultFakeSwtJar", "unitTest");
 
-        final File swtRuntime = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtJar);
-        assertNull(swtRuntime);
+        final File swtRuntime = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtDefaultJar);
+        assertNotNull(swtRuntime);
+        assertEquals(swtFromClasspath.getAbsolutePath(), swtRuntime.getAbsolutePath());
+    }
+
+    @Test
+    public void swtRuntimeRequirementMet_loadDefaultSwtJarIfExists() throws IOException {
+        final PackageLocator locatorMock = mock(PackageLocator.class);
+        when(locatorMock.locatePackage(SWT.class)).thenThrow(new NoClassDefFoundError());
+
+        StandardWidgetToolkitProvider.PACKAGE_LOCATOR_OVERRIDE = locatorMock;
+
+        final File swtJar = File.createTempFile("eclipseSwtProviderExists", "unitTest");
+
+        File actualJarFile = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtJar);
+        assertNotNull(actualJarFile);
+        assertEquals(swtJar.getAbsolutePath(), actualJarFile.getAbsolutePath());
+
+        //noinspection ResultOfMethodCallIgnored
+        swtJar.delete();
+        actualJarFile = StandardWidgetToolkitProvider.getSwtRuntimeJar(swtJar);
+        assertNull(actualJarFile);
     }
 }
