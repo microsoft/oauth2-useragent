@@ -31,10 +31,13 @@ public class AppTest {
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
+    private final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
+
     private Properties oldProperties;
 
     @Before
     public void setUp() throws Exception {
+        adapter.reset();
         oldProperties = System.getProperties();
         final Properties tempProperties = new Properties(oldProperties);
         System.setProperties(tempProperties);
@@ -85,7 +88,6 @@ public class AppTest {
 
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
-        final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
 
         final String listenAddress = "0.0.0.0" /* all interfaces */;
         final int listenPort = 0 /* automatic port */;
@@ -116,7 +118,6 @@ public class AppTest {
 
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
-        final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
 
         final String listenAddress = "0.0.0.0" /* all interfaces */;
         final int listenPort = 0 /* automatic port */;
