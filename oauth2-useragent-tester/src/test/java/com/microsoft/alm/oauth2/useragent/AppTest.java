@@ -28,6 +28,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 public class AppTest {
 
     private static final String PROTOCOL = "http";
+    private static final InetSocketAddress ALL_INTERFACES_AUTOMATIC_PORT =
+        new InetSocketAddress("0.0.0.0" /* all interfaces */, 0 /* automatic port */);
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
@@ -89,13 +91,10 @@ public class AppTest {
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
 
-        final String listenAddress = "0.0.0.0" /* all interfaces */;
-        final int listenPort = 0 /* automatic port */;
-        final InetSocketAddress requestedAddress = new InetSocketAddress(listenAddress, listenPort);
         final HttpProxyServer proxyServer =
             DefaultHttpProxyServer
                 .bootstrap()
-                .withAddress(requestedAddress)
+                .withAddress(ALL_INTERFACES_AUTOMATIC_PORT)
                 .withFiltersSource(adapter)
                 .start();
 
@@ -119,13 +118,10 @@ public class AppTest {
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
 
-        final String listenAddress = "0.0.0.0" /* all interfaces */;
-        final int listenPort = 0 /* automatic port */;
-        final InetSocketAddress requestedAddress = new InetSocketAddress(listenAddress, listenPort);
         final HttpProxyServer proxyServer =
                 DefaultHttpProxyServer
                         .bootstrap()
-                        .withAddress(requestedAddress)
+                        .withAddress(ALL_INTERFACES_AUTOMATIC_PORT)
                         .withFiltersSource(adapter)
                         .start();
 
