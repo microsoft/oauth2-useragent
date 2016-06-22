@@ -4,7 +4,9 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,6 +30,20 @@ public class AppTest {
     private static final String PROTOCOL = "http";
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
+
+    private Properties oldProperties;
+
+    @Before
+    public void setUp() throws Exception {
+        oldProperties = System.getProperties();
+        final Properties tempProperties = new Properties(oldProperties);
+        System.setProperties(tempProperties);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.setProperties(oldProperties);
+    }
 
     @Category(IntegrationTests.class)
     @Test public void main_wiremock() throws URISyntaxException, AuthorizationException, UnknownHostException {
@@ -69,7 +85,6 @@ public class AppTest {
 
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
-        final Properties oldProperties = System.getProperties();
         final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
 
         final String listenAddress = "0.0.0.0" /* all interfaces */;
@@ -96,13 +111,11 @@ public class AppTest {
         }
         finally {
             proxyServer.stop();
-            System.setProperties(oldProperties);
         }
     }
 
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
-        final Properties oldProperties = System.getProperties();
         final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
 
         final String listenAddress = "0.0.0.0" /* all interfaces */;
@@ -142,7 +155,6 @@ public class AppTest {
         }
         finally {
             proxyServer.stop();
-            System.setProperties(oldProperties);
         }
     }
 }
