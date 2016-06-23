@@ -42,6 +42,16 @@ public class InterceptingBrowserTest {
     }
 
     @Test
+    public void matchesRedirection_expectedContainsQuery() throws Exception {
+        final String redirectUriString = "http://auth.example.com/success?state=chicken";
+        final String actualUriString = "http://auth.example.com/success?code=steak&state=chicken";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(true, actual);
+    }
+
+    @Test
     public void matchesRedirection_pathWithoutSlash() throws Exception {
         final String redirectUriString = "http://auth.example.com";
         final String actualUriString = "http://auth.example.com/";
