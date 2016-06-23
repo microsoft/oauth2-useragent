@@ -3,6 +3,7 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.utils.StringHelper;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -78,7 +79,29 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
     }
 
     static boolean matchesRedirection(final String expectedRedirectUriString, final String actualUriString) {
-        return (actualUriString != null && actualUriString.startsWith(expectedRedirectUriString));
+        if (actualUriString == null) {
+            return false;
+        }
+        final URI actualUri = URI.create(actualUriString);
+        final URI expectedUri = URI.create(expectedRedirectUriString);
+
+        if (!StringHelper.equalIgnoringCase(expectedUri.getScheme(), actualUri.getScheme())) {
+            return false;
+        }
+
+        if (!StringHelper.equalIgnoringCase(expectedUri.getHost(), actualUri.getHost())) {
+            return false;
+        }
+
+        if (expectedUri.getPort() != actualUri.getPort()) {
+            return false;
+        }
+
+        if (!StringHelper.equal(expectedUri.getPath(), actualUri.getPath())) {
+            return false;
+        }
+
+        return true;
     }
 
     public void sendRequest(final URI destinationUri, final URI redirectUri) {
