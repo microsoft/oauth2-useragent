@@ -113,6 +113,7 @@ public class AppTest {
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("http.proxyHost", localHostName);
         tempProperties.setProperty("http.proxyPort", proxyPort);
+        tempProperties.setProperty("http.nonProxyHosts", "localhost");
         System.setProperties(tempProperties);
 
         test_main_wiremock(providerName);
