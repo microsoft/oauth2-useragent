@@ -3,6 +3,7 @@
 
 package com.microsoft.alm.oauth2.useragent;
 
+import com.microsoft.alm.oauth2.useragent.utils.StringHelper;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -67,7 +68,7 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
     public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
         lock.lock();
         try {
-            if (redirectUriString != null && newValue != null && newValue.startsWith(redirectUriString)) {
+            if (matchesRedirection(redirectUriString, newValue)) {
                 response = UserAgentImpl.extractResponseFromRedirectUri(newValue);
                 responseReceived.signal();
             }
@@ -75,6 +76,44 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
         finally {
             lock.unlock();
         }
+    }
+
+    static boolean matchesRedirection(final String expectedRedirectUriString, final String actualUriString) {
+        if (actualUriString == null) {
+            return false;
+        }
+        final URI actualUri = URI.create(actualUriString);
+        final URI expectedUri = URI.create(expectedRedirectUriString);
+
+        if (!StringHelper.equalIgnoringCase(expectedUri.getScheme(), actualUri.getScheme())) {
+            return false;
+        }
+
+        if (!StringHelper.equalIgnoringCase(expectedUri.getHost(), actualUri.getHost())) {
+            return false;
+        }
+
+        if (expectedUri.getPort() != actualUri.getPort()) {
+            return false;
+        }
+
+        final String actualPath = actualUri.getPath();
+        final String expectedPath = expectedUri.getPath();
+        if (actualPath != null) {
+            if (expectedPath == null) {
+                return false;
+            }
+            if (!actualPath.startsWith(expectedPath)) {
+                return false;
+            }
+        }
+        else {
+            if (expectedPath != null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void sendRequest(final URI destinationUri, final URI redirectUri) {
