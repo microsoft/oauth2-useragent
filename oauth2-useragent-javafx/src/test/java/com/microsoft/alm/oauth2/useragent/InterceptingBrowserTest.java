@@ -31,4 +31,14 @@ public class InterceptingBrowserTest {
         Assert.assertEquals(true, actual);
     }
 
+    @Test
+    public void matchesRedirection_pathIsCaseSensitive() throws Exception {
+        final String redirectUriString = "http://auth.example.com/success";
+        final String actualUriString = "http://auth.example.com/Success?code=steak&state=chicken";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(false, actual);
+    }
+
 }
