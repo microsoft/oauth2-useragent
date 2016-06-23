@@ -97,8 +97,20 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
             return false;
         }
 
-        if (!StringHelper.equal(expectedUri.getPath(), actualUri.getPath())) {
-            return false;
+        final String actualPath = actualUri.getPath();
+        final String expectedPath = expectedUri.getPath();
+        if (actualPath != null) {
+            if (expectedPath == null) {
+                return false;
+            }
+            if (!actualPath.startsWith(expectedPath)) {
+                return false;
+            }
+        }
+        else {
+            if (expectedPath != null) {
+                return false;
+            }
         }
 
         return true;

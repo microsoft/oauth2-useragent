@@ -41,4 +41,14 @@ public class InterceptingBrowserTest {
         Assert.assertEquals(false, actual);
     }
 
+    @Test
+    public void matchesRedirection_pathWithoutSlash() throws Exception {
+        final String redirectUriString = "http://auth.example.com";
+        final String actualUriString = "http://auth.example.com/";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(true, actual);
+    }
+
 }
