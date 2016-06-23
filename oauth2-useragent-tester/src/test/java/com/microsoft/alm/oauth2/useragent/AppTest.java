@@ -28,6 +28,7 @@ public class AppTest {
     private static final String PROTOCOL = "http";
     private static final InetSocketAddress ALL_INTERFACES_AUTOMATIC_PORT =
         new InetSocketAddress("0.0.0.0" /* all interfaces */, 0 /* automatic port */);
+    private static final String JAVA_FX = Provider.JAVA_FX.getClassName();
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
@@ -65,7 +66,11 @@ public class AppTest {
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_wiremock() throws Exception {
+    @Test public void main_wiremock_JavaFX() throws Exception {
+        test_main_wiremock(JAVA_FX);
+    }
+
+    private void test_main_wiremock(final String providerName) throws Exception {
         final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
         final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
         final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
@@ -85,7 +90,7 @@ public class AppTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/html")
                         .withBody("Access granted, although you shouldn't see this message!")));
-        final String[] args = {authorizationEndpoint.toString(), redirectUri.toString()};
+        final String[] args = {authorizationEndpoint.toString(), redirectUri.toString(), providerName};
 
         try {
             App.main(args);
@@ -100,21 +105,27 @@ public class AppTest {
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_withProxyServerEnabled() throws Exception {
+    @Test public void main_withProxyServerEnabled_JavaFX() throws Exception {
+        test_main_withProxyServerEnabled(JAVA_FX);
+    }
 
+    private void test_main_withProxyServerEnabled(final String providerName) throws Exception {
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("http.proxyHost", localHostName);
         tempProperties.setProperty("http.proxyPort", proxyPort);
         System.setProperties(tempProperties);
 
-        main_wiremock();
+        test_main_wiremock(providerName);
 
         Assert.assertTrue(adapter.proxyWasUsed());
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_withProxyServerTunnellingTLS() throws Exception {
+    @Test public void main_withProxyServerTunnellingTLS_JavaFX() throws Exception {
+        test_main_withProxyServerTunnellingTLS(JAVA_FX);
+    }
 
+    private void test_main_withProxyServerTunnellingTLS(final String providerName) throws Exception {
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("https.proxyHost", localHostName);
         tempProperties.setProperty("http.proxyHost", localHostName);
@@ -122,7 +133,7 @@ public class AppTest {
         tempProperties.setProperty("http.proxyPort", proxyPort);
         System.setProperties(tempProperties);
 
-        final String[] args = {"https://visualstudio.com", "https://www.visualstudio.com"};
+        final String[] args = {"https://visualstudio.com", "https://www.visualstudio.com", providerName};
 
         boolean exceptionWasThrown = false;
         try {
