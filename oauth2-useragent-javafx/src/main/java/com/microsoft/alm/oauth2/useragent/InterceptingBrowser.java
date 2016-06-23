@@ -67,7 +67,7 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
     public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
         lock.lock();
         try {
-            if (newValue != null && newValue.startsWith(redirectUriString)) {
+            if (matchesRedirection(redirectUriString, newValue)) {
                 response = UserAgentImpl.extractResponseFromRedirectUri(newValue);
                 responseReceived.signal();
             }
@@ -75,6 +75,10 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
         finally {
             lock.unlock();
         }
+    }
+
+    static boolean matchesRedirection(final String expectedRedirectUriString, final String actualUriString) {
+        return (actualUriString != null && actualUriString.startsWith(expectedRedirectUriString));
     }
 
     public void sendRequest(final URI destinationUri, final URI redirectUri) {
