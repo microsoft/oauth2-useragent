@@ -11,4 +11,14 @@ import org.junit.Test;
  */
 public class InterceptingBrowserTest {
 
+    @Test
+    public void matchesRedirection_typical() throws Exception {
+        final String redirectUriString = "http://auth.example.com/success";
+        final String actualUriString = "http://auth.example.com/success?code=steak&state=chicken";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(true, actual);
+    }
+
 }
