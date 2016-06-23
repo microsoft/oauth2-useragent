@@ -36,29 +36,42 @@ public class AppTest {
     private final LoggingFiltersSourceAdapter adapter = new LoggingFiltersSourceAdapter();
 
     private Properties oldProperties;
+    private String localHostName;
+    private int wireMockPort;
+    private HttpProxyServer proxyServer;
+    private String proxyPort;
 
     @Before
     public void setUp() throws Exception {
         adapter.reset();
+        proxyServer = DefaultHttpProxyServer
+            .bootstrap()
+            .withAddress(ALL_INTERFACES_AUTOMATIC_PORT)
+            .withFiltersSource(adapter)
+            .start();
+        final InetSocketAddress proxyAddress = proxyServer.getListenAddress();
+        proxyPort = Integer.toString(proxyAddress.getPort(), 10);
+
         oldProperties = System.getProperties();
         final Properties tempProperties = new Properties(oldProperties);
         System.setProperties(tempProperties);
+        final InetAddress localHostAddress = InetAddress.getLocalHost();
+        localHostName = localHostAddress.getHostName();
+        wireMockPort = wireMockRule.port();
     }
 
     @After
     public void tearDown() throws Exception {
         System.setProperties(oldProperties);
+        proxyServer.stop();
     }
 
     @Category(IntegrationTests.class)
     @Test public void main_wiremock() throws URISyntaxException, AuthorizationException, UnknownHostException {
-        final int port = wireMockRule.port();
-        final InetAddress localHostAddress = InetAddress.getLocalHost();
-        final String host = localHostAddress.getHostName();
-        final URI authorizationEndpoint = new URI(PROTOCOL, null, host, port, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
-        final URI authorizationConfirmation = new URI(PROTOCOL, null, host, port, "/oauth2/confirm", "state=chicken", null);
+        final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
+        final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
         final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
-        final URI redirectUri = new URI(PROTOCOL, null, host, port, "/finished", "code=steak&state=chicken", null);
+        final URI redirectUri = new URI(PROTOCOL, null, localHostName, wireMockPort, "/finished", "code=steak&state=chicken", null);
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -91,67 +104,38 @@ public class AppTest {
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
 
-        final HttpProxyServer proxyServer =
-            DefaultHttpProxyServer
-                .bootstrap()
-                .withAddress(ALL_INTERFACES_AUTOMATIC_PORT)
-                .withFiltersSource(adapter)
-                .start();
+        final Properties tempProperties = new Properties(oldProperties);
+        tempProperties.setProperty("http.proxyHost", localHostName);
+        tempProperties.setProperty("http.proxyPort", proxyPort);
+        System.setProperties(tempProperties);
 
-        try {
-            final Properties tempProperties = new Properties(oldProperties);
-            final InetAddress localHost = InetAddress.getLocalHost();
-            tempProperties.setProperty("http.proxyHost", localHost.getHostName());
-            final InetSocketAddress proxyAddress = proxyServer.getListenAddress();
-            tempProperties.setProperty("http.proxyPort", Integer.toString(proxyAddress.getPort(), 10));
-            System.setProperties(tempProperties);
+        main_wiremock();
 
-            main_wiremock();
-
-            Assert.assertTrue(adapter.proxyWasUsed());
-        }
-        finally {
-            proxyServer.stop();
-        }
+        Assert.assertTrue(adapter.proxyWasUsed());
     }
 
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
 
-        final HttpProxyServer proxyServer =
-                DefaultHttpProxyServer
-                        .bootstrap()
-                        .withAddress(ALL_INTERFACES_AUTOMATIC_PORT)
-                        .withFiltersSource(adapter)
-                        .start();
+        final Properties tempProperties = new Properties(oldProperties);
+        tempProperties.setProperty("https.proxyHost", localHostName);
+        tempProperties.setProperty("http.proxyHost", localHostName);
+        tempProperties.setProperty("https.proxyPort", proxyPort);
+        tempProperties.setProperty("http.proxyPort", proxyPort);
+        System.setProperties(tempProperties);
 
+        final String[] args = {"https://visualstudio.com", "https://www.visualstudio.com"};
+
+        boolean exceptionWasThrown = false;
         try {
-            final Properties tempProperties = new Properties(oldProperties);
-            final InetAddress localHost = InetAddress.getLocalHost();
-            tempProperties.setProperty("https.proxyHost", localHost.getHostName());
-            tempProperties.setProperty("http.proxyHost", localHost.getHostName());
-            final InetSocketAddress proxyAddress = proxyServer.getListenAddress();
-            final String proxyPort = Integer.toString(proxyAddress.getPort(), 10);
-            tempProperties.setProperty("https.proxyPort", proxyPort);
-            tempProperties.setProperty("http.proxyPort", proxyPort);
-            System.setProperties(tempProperties);
-
-            final String[] args = {"https://visualstudio.com", "https://www.visualstudio.com"};
-
-            boolean exceptionWasThrown = false;
-            try {
-                App.main(args);
-            }
-            catch (final AuthorizationException ignored) {
-                // we can't distinguish failure to connect from a successful redirect!
-                exceptionWasThrown = true;
-            }
-
-            Assert.assertTrue(exceptionWasThrown);
-            Assert.assertTrue(adapter.proxyWasUsed());
+            App.main(args);
         }
-        finally {
-            proxyServer.stop();
+        catch (final AuthorizationException ignored) {
+            // we can't distinguish failure to connect from a successful redirect!
+            exceptionWasThrown = true;
         }
+
+        Assert.assertTrue(exceptionWasThrown);
+        Assert.assertTrue(adapter.proxyWasUsed());
     }
 }
