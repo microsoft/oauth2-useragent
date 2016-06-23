@@ -16,8 +16,6 @@ import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -67,7 +65,7 @@ public class AppTest {
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_wiremock() throws URISyntaxException, AuthorizationException, UnknownHostException {
+    @Test public void main_wiremock() throws Exception {
         final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
         final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
         final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
@@ -102,7 +100,7 @@ public class AppTest {
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_withProxyServerEnabled() throws URISyntaxException, AuthorizationException, UnknownHostException {
+    @Test public void main_withProxyServerEnabled() throws Exception {
 
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("http.proxyHost", localHostName);
@@ -115,7 +113,7 @@ public class AppTest {
     }
 
     @Category(IntegrationTests.class)
-    @Test public void main_withProxyServerTunnellingTLS() throws URISyntaxException, AuthorizationException, UnknownHostException {
+    @Test public void main_withProxyServerTunnellingTLS() throws Exception {
 
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("https.proxyHost", localHostName);
