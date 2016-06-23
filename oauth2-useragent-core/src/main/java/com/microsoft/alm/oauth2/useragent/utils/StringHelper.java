@@ -12,6 +12,21 @@ public class StringHelper {
         return s1.equals(s2);
     }
 
+    public static boolean equalIgnoringCase(final String a, final String b) {
+        //noinspection StringEquality
+        if (a == b) {
+            return true;
+        }
+        if (a != null && b != null) {
+            int n = a.length();
+            if (b.length() != n) {
+                return false;
+            }
+            return a.regionMatches(true, 0, b, 0, n);
+        }
+        return false;
+    }
+
     public static String join(final String separator, final String[] value) {
         if (value == null)
             throw new IllegalArgumentException("value is null");
