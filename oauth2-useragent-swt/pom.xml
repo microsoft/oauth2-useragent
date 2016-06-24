@@ -16,15 +16,6 @@
 
   <name>Eclipse SWT provider for Microsoft OAuth 2.0 User Agent library for Java</name>
 
-  <properties>
-    <!-- The following properties are set during the "initialize" phase by some Groovy code below.
-    They must not be present in this element, even if the IDE says their use can't be resolved.
-    <SWT_TEST_VM_OPTIONS />
-    <SWT_DEPENDENCY_EXCLUDES />
-    <SWT_RUNTIME_JAR />
-    -->
-  </properties>
-
   <build>
     <plugins>
       <plugin>
@@ -78,17 +69,6 @@
          and the parent POM, so disable installation here -->
         <configuration>
           <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludedGroups>com.microsoft.alm.oauth2.useragent.IntegrationTests</excludedGroups>
-          <argLine>${SWT_TEST_VM_OPTIONS}</argLine>
-          <classpathDependencyExcludes>${SWT_DEPENDENCY_EXCLUDES}</classpathDependencyExcludes>
-          <additionalClasspathElements>
-            <additionalClasspathElement>${SWT_RUNTIME_JAR}</additionalClasspathElement>
-          </additionalClasspathElements>
         </configuration>
       </plugin>
     </plugins>
