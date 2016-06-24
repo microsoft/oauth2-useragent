@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -29,6 +30,7 @@ public class AppTest {
     private static final InetSocketAddress ALL_INTERFACES_AUTOMATIC_PORT =
         new InetSocketAddress("0.0.0.0" /* all interfaces */, 0 /* automatic port */);
     private static final String JAVA_FX = Provider.JAVA_FX.getClassName();
+    private static final String STANDARD_WIDGET_TOOLKIT = Provider.STANDARD_WIDGET_TOOLKIT.getClassName();
 
     @Rule public WireMockRule wireMockRule = new WireMockRule(0);
 
@@ -70,6 +72,11 @@ public class AppTest {
         test_main_wiremock(JAVA_FX);
     }
 
+    @Category(IntegrationTests.class)
+    @Test public void main_wiremock_swt() throws Exception {
+        test_main_wiremock(STANDARD_WIDGET_TOOLKIT);
+    }
+
     private void test_main_wiremock(final String providerName) throws Exception {
         final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
         final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
@@ -109,6 +116,12 @@ public class AppTest {
         test_main_withProxyServerEnabled(JAVA_FX);
     }
 
+    @Category(IntegrationTests.class)
+    @Ignore("The proxy server used by SWT can't be reliably configured via code: https://www.eclipse.org/swt/faq.php#browserproxy")
+    @Test public void main_withProxyServerEnabled_swt() throws Exception {
+        test_main_withProxyServerEnabled(STANDARD_WIDGET_TOOLKIT);
+    }
+
     private void test_main_withProxyServerEnabled(final String providerName) throws Exception {
         final Properties tempProperties = new Properties(oldProperties);
         tempProperties.setProperty("http.proxyHost", localHostName);
@@ -124,6 +137,12 @@ public class AppTest {
     @Category(IntegrationTests.class)
     @Test public void main_withProxyServerTunnellingTLS_JavaFX() throws Exception {
         test_main_withProxyServerTunnellingTLS(JAVA_FX);
+    }
+
+    @Category(IntegrationTests.class)
+    @Ignore("The proxy server used by SWT can't be reliably configured via code: https://www.eclipse.org/swt/faq.php#browserproxy")
+    @Test public void main_withProxyServerTunnellingTLS_swt() throws Exception {
+        test_main_withProxyServerTunnellingTLS(STANDARD_WIDGET_TOOLKIT);
     }
 
     private void test_main_withProxyServerTunnellingTLS(final String providerName) throws Exception {
