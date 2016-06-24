@@ -47,7 +47,7 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     private static final Map<String, String> SAFE_REPLACEMENTS;
 
     static {
-        // http://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
+        // https://docs.oracle.com/javase/7/docs/api/java/net/doc-files/net-properties.html
         final Set<String> networkingPropertyNames = new HashSet<String>();
         // HTTP
         networkingPropertyNames.add("http.proxyHost");

@@ -18,7 +18,7 @@
   <licenses>
     <license>
       <name>MIT License</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <url>https://opensource.org/licenses/mit-license.php</url>
     </license>
   </licenses>
 
@@ -27,7 +27,7 @@
       <name>Oli Dagenais</name>
       <email>olivida@microsoft.com</email>
       <organization>Microsoft</organization>
-      <organizationUrl>http://www.microsoft.com/</organizationUrl>
+      <organizationUrl>https://www.microsoft.com/</organizationUrl>
     </developer>
   </developers>
 

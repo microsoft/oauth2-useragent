@@ -36,7 +36,7 @@ public class PackageLocator {
             throw new IllegalArgumentException("clazz was null");
         }
 
-        // Inspired by http://stackoverflow.com/a/12733172
+        // Inspired by https://stackoverflow.com/a/12733172
         File classFilePath = getClasspathFromProtectionDomain(clazz);
         if (classFilePath == null) {
             classFilePath = getClasspathFromResource(clazz);

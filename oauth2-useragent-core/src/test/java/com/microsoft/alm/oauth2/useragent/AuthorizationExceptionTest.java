@@ -15,7 +15,7 @@ public class AuthorizationExceptionTest {
     @Test public void toString_simpleRoundTrip() throws Exception {
         final String code = "code";
         final String description = "I am a verbose description of the error.";
-        final URI uri = URI.create("http://example.com/oauth2/error/code");
+        final URI uri = URI.create("https://example.com/oauth2/error/code");
 
         final String actual = AuthorizationException.toString(code, description, uri);
 
@@ -34,7 +34,7 @@ public class AuthorizationExceptionTest {
     @Test public void toString_throwableRoundTrip() throws Exception {
         final String code = "code";
         final String message = "A strange game. The only winning move is not to play.";
-        final URI uri = URI.create("http://example.com/oauth2/error/code");
+        final URI uri = URI.create("https://example.com/oauth2/error/code");
         try {
             throw new IllegalStateException(message);
         }

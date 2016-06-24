@@ -13,8 +13,8 @@ public class InterceptingBrowserTest {
 
     @Test
     public void matchesRedirection_typical() throws Exception {
-        final String redirectUriString = "http://auth.example.com/success";
-        final String actualUriString = "http://auth.example.com/success?code=steak&state=chicken";
+        final String redirectUriString = "https://auth.example.com/success";
+        final String actualUriString = "https://auth.example.com/success?code=steak&state=chicken";
 
         final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
 
@@ -23,8 +23,8 @@ public class InterceptingBrowserTest {
 
     @Test
     public void matchesRedirection_hostIsCaseInsensitive() throws Exception {
-        final String redirectUriString = "http://Auth.example.com/success";
-        final String actualUriString = "http://auth.example.com/success?code=steak&state=chicken";
+        final String redirectUriString = "https://Auth.example.com/success";
+        final String actualUriString = "https://auth.example.com/success?code=steak&state=chicken";
 
         final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
 
@@ -33,8 +33,8 @@ public class InterceptingBrowserTest {
 
     @Test
     public void matchesRedirection_pathIsCaseSensitive() throws Exception {
-        final String redirectUriString = "http://auth.example.com/success";
-        final String actualUriString = "http://auth.example.com/Success?code=steak&state=chicken";
+        final String redirectUriString = "https://auth.example.com/success";
+        final String actualUriString = "https://auth.example.com/Success?code=steak&state=chicken";
 
         final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
 
@@ -43,8 +43,8 @@ public class InterceptingBrowserTest {
 
     @Test
     public void matchesRedirection_expectedContainsQuery() throws Exception {
-        final String redirectUriString = "http://auth.example.com/success?state=chicken";
-        final String actualUriString = "http://auth.example.com/success?code=steak&state=chicken";
+        final String redirectUriString = "https://auth.example.com/success?state=chicken";
+        final String actualUriString = "https://auth.example.com/success?code=steak&state=chicken";
 
         final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
 
@@ -53,8 +53,8 @@ public class InterceptingBrowserTest {
 
     @Test
     public void matchesRedirection_pathWithoutSlash() throws Exception {
-        final String redirectUriString = "http://auth.example.com";
-        final String actualUriString = "http://auth.example.com/";
+        final String redirectUriString = "https://auth.example.com";
+        final String actualUriString = "https://auth.example.com/";
 
         final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
 

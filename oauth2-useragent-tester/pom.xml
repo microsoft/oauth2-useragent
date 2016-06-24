@@ -23,7 +23,7 @@
         <configuration>
           <archive>
             <manifest>
-              <!-- http://stackoverflow.com/a/6773868/ -->
+              <!-- https://stackoverflow.com/a/6773868/ -->
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>

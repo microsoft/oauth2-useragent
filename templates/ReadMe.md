@@ -18,7 +18,7 @@ What this library provides
 --------------------------
 There is a `UserAgentImpl` class (which is mockable via the `UserAgent` interface it implements).
 
-The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authorization Code Flow" (see Figure 3 in [section 4.1 of RFC 6749](http://tools.ietf.org/html/rfc6749#section-4.1)), which is to say:
+The `requestAuthorizationCode` method will perform steps (A)-(C) of the "Authorization Code Flow" (see Figure 3 in [section 4.1 of RFC 6749](https://tools.ietf.org/html/rfc6749#section-4.1)), which is to say:
 <ol type="A">
   <li>a browser window (also known as "user-agent") will be opened and directed to the authorization endpoint URI</li>
   <li>the user (also known as "resource owner") can then authenticate and decide whether to authorize the client's request</li>
