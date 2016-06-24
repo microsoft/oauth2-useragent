@@ -108,28 +108,13 @@ public class StandardWidgetToolkitTest {
         final int port = wireMockRule.port();
 
         final URI authorizationEndpoint = new URI(HTTP_PROTOCOL, null, HOST, port, "/oauth2/authorize",
-                "response_type=code&client_id=main_wiremock&state=chicken", null);
-        final URI authorizationConfirmation = new URI(HTTP_PROTOCOL, null, HOST, port, "/oauth2/confirm",
-                "state=chicken", null);
-        final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'>" +
-                "</head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
+                "response_type=code&client_id=happyPath&state=chicken", null);
         final URI redirectUri = new URI(HTTP_PROTOCOL, null, HOST, port, "/finished", "code=steak&state=chicken", null);
 
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/html")
-                        .withBody(redirectingBody)));
-        stubFor(get(urlEqualTo(authorizationConfirmation.getPath() + "?" + authorizationConfirmation.getQuery()))
-                .willReturn(aResponse()
                         .withStatus(302)
-                        .withHeader("Location", redirectUri.toString())
-                        .withBody(redirectingBody)));
-        stubFor(get(urlEqualTo(redirectUri.getPath() + "?" + redirectUri.getQuery()))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/html")
-                        .withBody("Access granted, although you shouldn't see this message!")));
+                        .withHeader("Location", redirectUri.toString())));
 
         StandardWidgetToolkit.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<StandardWidgetToolkit>() {
             public Runnable create(final StandardWidgetToolkit standardWidgetToolkit) {
