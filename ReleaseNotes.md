@@ -1,8 +1,7 @@
-These notes are for release **(to be determined)**.
+These notes are for release **0.10.0**.
 Other releases and their notes can be found at the [oauth2-useragent GitHub Releases](https://github.com/Microsoft/oauth2-useragent/releases) page.
 
 * Major:
-    * TODO
+    * Add preliminary support for a user agent using the Standard Widget Toolkit (SWT).  Thanks to @yacaovsnc for pull request #30!
 * Minor:
-    * TODO
-
+    * Enhance the functional tests for re-use, via pull request #29.
