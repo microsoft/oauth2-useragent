@@ -22,13 +22,7 @@ public class App
 
         final UserAgent userAgent = new UserAgentImpl();
         if (providerName != null) {
-            final ProviderScanner providerScanner = (ProviderScanner) userAgent;
-            final Provider provider = providerScanner.findCompatibleProvider(providerName);
-            if (provider == null) {
-                final String template = "The '%s' provider is not available!";
-                final String message = String.format(template, providerName);
-                throw new UnsupportedOperationException(message);
-            }
+            System.setProperty(UserAgentImpl.USER_AGENT_PROVIDER_PROPERTY_NAME, providerName);
         }
 
         final AuthorizationResponse authorizationResponse = userAgent.requestAuthorizationCode(authorizationEndpoint, redirectUri);

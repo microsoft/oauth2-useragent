@@ -4,43 +4,46 @@
 package com.microsoft.alm.oauth2.useragent;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.sun.javafx.application.LauncherImpl;
-import javafx.application.Platform;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.Assert.assertEquals;
 
-public class JavaFxTest {
+public class StandardWidgetToolkitTest {
 
-    private static final String INSECURE_PROTOCOL = "https";
+    private static final String HTTP_PROTOCOL = "http";
     private static final String HOST = "localhost";
+    private static final String[] args = {UserAgentImpl.REQUEST_AUTHORIZATION_CODE};
 
-    @Rule public WireMockRule wireMockRule = new WireMockRule(0, 0);
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(0, 0);
 
-    private final AtomicReference<Exception> expectedExceptionRef = new AtomicReference<>();
-    private final AtomicReference<Exception> actualExceptionRef = new AtomicReference<>();
+    private final AtomicReference<Exception> expectedExceptionRef = new AtomicReference<Exception>();
+    private final AtomicReference<Exception> actualExceptionRef = new AtomicReference<Exception>();
 
-    @Before public void before() {
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = null;
+    @Before
+    public void setUp() throws Exception {
+        StandardWidgetToolkit.RUNNABLE_FACTORY_OVERRIDE = null;
         expectedExceptionRef.set(null);
         actualExceptionRef.set(null);
     }
 
-    @After public void after() {
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = null;
+    @After
+    public void tearDown() {
+        StandardWidgetToolkit.RUNNABLE_FACTORY_OVERRIDE = null;
         final Exception actualException = this.actualExceptionRef.get();
         //noinspection ThrowableResultOfMethodCallIgnored
         final Exception expectedException = this.expectedExceptionRef.get();
@@ -58,76 +61,82 @@ public class JavaFxTest {
                 final String template = "Expected exception '%1$s', got nothing.";
                 final String message = String.format(template, expectedException.getClass().toString());
                 Assert.fail(message);
-            }
-            else {
-                Assert.assertEquals(expectedException.getClass(), actualException.getClass());
-                Assert.assertEquals(expectedException.getMessage(), actualException.getMessage());
+            } else {
+                assertEquals(expectedException.getClass(), actualException.getClass());
+                assertEquals(expectedException.getMessage(), actualException.getMessage());
                 if (actualException instanceof AuthorizationException) {
                     final AuthorizationException expectedAuthz = (AuthorizationException) expectedException;
                     final AuthorizationException actualAuthz = (AuthorizationException) actualException;
                     final String prefix = expectedAuthz.getDescription();
                     final String firstPart = actualAuthz.getDescription().substring(0, prefix.length());
-                    Assert.assertEquals(actualAuthz.getDescription(), prefix, firstPart);
+                    assertEquals(actualAuthz.getDescription(), prefix, firstPart);
                 }
             }
         }
     }
 
     @Category(IntegrationTests.class)
-    @Ignore("JavaFX fails if Application.launch() is called more than once; the other test is more important.")
-    @Test public void nullPointerException() {
+    @Test
+    public void nullPointerException() {
         expectedExceptionRef.set(new NullPointerException());
         final String[] args = {UserAgentImpl.REQUEST_AUTHORIZATION_CODE};
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<JavaFx>() {
-            public Runnable create(final JavaFx javaFx) {
+        StandardWidgetToolkit.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<StandardWidgetToolkit>() {
+            public Runnable create(final StandardWidgetToolkit standardWidgetToolkit) {
                 return new Runnable() {
                     public void run() {
                         try {
-                            javaFx.requestAuthorizationCode(null, null);
+                            standardWidgetToolkit.requestAuthorizationCode(null, null);
                         }
                         catch (final Exception e) {
                             actualExceptionRef.set(e);
-                        }
-                        finally {
-                            Platform.exit();
+                        } finally {
+                            standardWidgetToolkit.dispose();
                         }
                     }
                 };
             }
         };
 
-        LauncherImpl.launchApplication(JavaFx.class, args);
+        StandardWidgetToolkit.main(args);
     }
 
     @Category(IntegrationTests.class)
-    @Test public void insecureWiremock() throws URISyntaxException, AuthorizationException {
-        expectedExceptionRef.set(new AuthorizationException("load_error", "java.lang.Throwable: SSL handshake failed", null, null));
-        final int insecurePort = wireMockRule.httpsPort();
-        final URI authorizationEndpoint = new URI(INSECURE_PROTOCOL, null, HOST, insecurePort, "/oauth2/authorize", "response_type=code&client_id=insecureWiremock&state=chicken", null);
-        final URI redirectUri = new URI(INSECURE_PROTOCOL, null, HOST, insecurePort, "/finished", null, null);
+    @Test
+    public void happyPath_getCode() throws URISyntaxException, AuthorizationException,
+            UnknownHostException {
+
+        final int port = wireMockRule.port();
+
+        final URI authorizationEndpoint = new URI(HTTP_PROTOCOL, null, HOST, port, "/oauth2/authorize",
+                "response_type=code&client_id=happyPath&state=chicken", null);
+        final URI redirectUri = new URI(HTTP_PROTOCOL, null, HOST, port, "/finished", "code=steak&state=chicken", null);
+
         stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
                 .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/html")));
-        JavaFx.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<JavaFx>() {
-            public Runnable create(final JavaFx javaFx) {
+                        .withStatus(302)
+                        .withHeader("Location", redirectUri.toString())));
+
+        StandardWidgetToolkit.RUNNABLE_FACTORY_OVERRIDE = new RunnableFactory<StandardWidgetToolkit>() {
+            public Runnable create(final StandardWidgetToolkit standardWidgetToolkit) {
                 return new Runnable() {
                     public void run() {
                         try {
-                            javaFx.requestAuthorizationCode(authorizationEndpoint, redirectUri);
+                            final AuthorizationResponse response =
+                                    standardWidgetToolkit.requestAuthorizationCode (authorizationEndpoint, redirectUri);
+
+                            assertEquals("steak", response.getCode());
+                            assertEquals("chicken", response.getState());
                         }
                         catch (final Exception e) {
                             actualExceptionRef.set(e);
-                        }
-                        finally {
-                            Platform.exit();
+                        } finally {
+                            standardWidgetToolkit.dispose();
                         }
                     }
                 };
             }
         };
 
-        LauncherImpl.launchApplication(JavaFx.class, null);
+        StandardWidgetToolkit.main(args);
     }
-
 }
