@@ -77,6 +77,11 @@ public class AppTest {
         test_main_wiremock(STANDARD_WIDGET_TOOLKIT);
     }
 
+    @Category(IntegrationTests.class)
+    @Test public void nativeapp_wiremock_javafx() throws Exception {
+        test_main_native_app_wiremock(JAVA_FX);
+    }
+
     private void test_main_wiremock(final String providerName) throws Exception {
         final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
         final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
@@ -109,6 +114,40 @@ public class AppTest {
         Assert.assertEquals("steak", App.code);
         Assert.assertEquals("chicken", App.state);
 
+    }
+
+    private void test_main_native_app_wiremock(final String providerName) throws Exception {
+        final URI authorizationEndpoint = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/authorize", "response_type=code&client_id=main_wiremock&state=chicken", null);
+        final URI authorizationConfirmation = new URI(PROTOCOL, null, localHostName, wireMockPort, "/oauth2/confirm", "state=chicken", null);
+        final String redirectingBody = String.format("<html><head><meta http-equiv='refresh' content='1; url=%1$s'></head><body>Redirecting to %1$s...</body></html>", authorizationConfirmation.toString());
+        final String nativeAppRedirect = "urn:ietf:wg:oauth:2.0:oob";
+        final URI redirectUri = new URI(nativeAppRedirect + "?code=steak&state=chicken");
+        stubFor(get(urlEqualTo(authorizationEndpoint.getPath() + "?" + authorizationEndpoint.getQuery()))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html")
+                        .withBody(redirectingBody)));
+        stubFor(get(urlEqualTo(authorizationConfirmation.getPath() + "?" + authorizationConfirmation.getQuery()))
+                .willReturn(aResponse()
+                        .withStatus(302)
+                        .withHeader("Location", redirectUri.toString())
+                        .withBody(redirectingBody)));
+        stubFor(get(urlEqualTo(redirectUri.getPath() + "?" + redirectUri.getQuery()))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html")
+                        .withBody("Access granted, although you shouldn't see this message!")));
+        final String[] args = {authorizationEndpoint.toString(), nativeAppRedirect, providerName};
+
+        try {
+            App.main(args);
+        }
+        catch (final AuthorizationException e) {
+            Assert.fail(e.getMessage() + UserAgentImpl.NEW_LINE + e.getDescription());
+        }
+
+        Assert.assertEquals("steak", App.code);
+        Assert.assertEquals("chicken", App.state);
     }
 
     @Category(IntegrationTests.class)

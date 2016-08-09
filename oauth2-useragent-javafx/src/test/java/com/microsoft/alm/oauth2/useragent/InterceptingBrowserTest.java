@@ -61,4 +61,24 @@ public class InterceptingBrowserTest {
         Assert.assertEquals(true, actual);
     }
 
+    @Test
+    public void matchesRedirection_urnSchemeWithNativeAppRedirect() throws Exception {
+        final String redirectUriString = "urn:ietf:wg:oauth:2.0:oob";
+        final String actualUriString = "urn:ietf:wg:oauth:2.0:oob?code=abc&stat=123";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(true, actual);
+    }
+
+
+    @Test
+    public void matchesRedirection_urnSchemeCaseSensitive() throws Exception {
+        final String redirectUriString = "urn:ietf:wg:oauth:2.0:oob";
+        final String actualUriString = "urn:IETF:wg:oauth:2.0:oob?code=abc&stat=123";
+
+        final boolean actual = InterceptingBrowser.matchesRedirection(redirectUriString, actualUriString);
+
+        Assert.assertEquals(false, actual);
+    }
 }

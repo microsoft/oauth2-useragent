@@ -18,8 +18,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -368,7 +370,14 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     }
 
     static String extractResponseFromRedirectUri(final String redirectedUri) {
-        final URI uri = URI.create(redirectedUri);
-        return uri.getQuery();
+        final URL uri;
+        try {
+            uri = new URL(redirectedUri);
+            return uri.getQuery();
+        } catch (MalformedURLException e) {
+            //ignored
+        }
+
+        return null;
     }
 }
