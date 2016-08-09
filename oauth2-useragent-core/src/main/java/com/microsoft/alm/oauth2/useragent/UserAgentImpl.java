@@ -156,6 +156,9 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
+
+        command.add("-Djava.protocol.handler.pkgs=com.microsoft.alm.oauth2.useragent");
+
         final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
         findCompatibleProvider(userAgentProvider, false);
         if (provider == null) {
