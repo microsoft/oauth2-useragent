@@ -18,8 +18,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,6 +158,9 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
         final ArrayList<String> classPath = new ArrayList<String>();
         // TODO: should we append ".exe" on Windows?
         command.add(new File(JAVA_HOME, "bin/java").getAbsolutePath());
+
+        command.add("-Djava.protocol.handler.pkgs=com.microsoft.alm.oauth2.useragent");
+
         final String userAgentProvider = System.getProperty(USER_AGENT_PROVIDER_PROPERTY_NAME);
         findCompatibleProvider(userAgentProvider, false);
         if (provider == null) {
@@ -365,7 +370,14 @@ public class UserAgentImpl implements UserAgent, ProviderScanner {
     }
 
     static String extractResponseFromRedirectUri(final String redirectedUri) {
-        final URI uri = URI.create(redirectedUri);
-        return uri.getQuery();
+        final URL uri;
+        try {
+            uri = new URL(redirectedUri);
+            return uri.getQuery();
+        } catch (MalformedURLException e) {
+            //ignored
+        }
+
+        return null;
     }
 }

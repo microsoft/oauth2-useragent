@@ -30,6 +30,7 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
 
     public InterceptingBrowser() {
         webEngine.locationProperty().addListener(this);
+
         final Worker<Void> loadWorker = webEngine.getLoadWorker();
         loadWorker.stateProperty().addListener(new ChangeListener<Worker.State>() {
             public void changed(final ObservableValue<? extends Worker.State> observable, final Worker.State oldValue, final Worker.State newValue) {
@@ -82,6 +83,7 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
         if (actualUriString == null) {
             return false;
         }
+
         final URI actualUri = URI.create(actualUriString);
         final URI expectedUri = URI.create(expectedRedirectUriString);
 
@@ -111,6 +113,10 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
             if (expectedPath != null) {
                 return false;
             }
+        }
+
+        if (actualUri.getScheme().equals("urn") && !actualUriString.startsWith(expectedRedirectUriString)) {
+            return false;
         }
 
         return true;
@@ -148,4 +154,5 @@ class InterceptingBrowser extends Region implements ChangeListener<String> {
             lock.unlock();
         }
     }
+
 }
