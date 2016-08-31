@@ -11,7 +11,7 @@ public class Version
     private final static Pattern JAVA_RUNTIME_VERSION =
             Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)-(?:.*-)?b(\\d+).*");
     private final static Pattern GENERIC_VERSION =
-            Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)\\.(\\d+).*");
+            Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*");
     private final int major;
     private final int minor;
     private final int patch;
@@ -46,7 +46,10 @@ public class Version
     }
 
     /**
-     * Parses a generic string that contains a version number in the format major.minor.patch
+     * Parses a generic string that contains a version number in the format
+     * major.minor.patch
+     * or
+     * major.minor
      *
      * @param version String containing the version number
      * @return Version object with version details
@@ -56,7 +59,8 @@ public class Version
         Matcher matcher = getMatches(GENERIC_VERSION, version);
         int major = Integer.parseInt(matcher.group(1));
         int minor = Integer.parseInt(matcher.group(2));
-        int patch = Integer.parseInt(matcher.group(3));
+        final String patchString = matcher.group(3);
+        final int patch = patchString != null ? Integer.parseInt(patchString) : 0;
 
         return new Version(major, minor, patch, 0, 0);
     }
