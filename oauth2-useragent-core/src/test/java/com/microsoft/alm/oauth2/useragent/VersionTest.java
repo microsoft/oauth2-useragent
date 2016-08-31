@@ -50,6 +50,10 @@ public class VersionTest
         testGenericVersion(10, 10, 5, "10.10.5");
     }
 
+    @Test public void macOsVersionWithoutPatch() {
+        testGenericVersion(10, 11, 0, "10.11");
+    }
+
     private void testGenericVersion(final int major, final int minor, final int patch, final String input) {
         final Version version = Version.parseVersion(input);
         Assert.assertEquals(major, version.getMajor());
