@@ -59,10 +59,13 @@ public class Version
         Matcher matcher = getMatches(GENERIC_VERSION, version);
         int major = Integer.parseInt(matcher.group(1));
         int minor = Integer.parseInt(matcher.group(2));
-        final String patchString = matcher.group(3);
-        final int patch = patchString != null ? Integer.parseInt(patchString) : 0;
+        int patch = integerOrZero(matcher.group(3));
 
         return new Version(major, minor, patch, 0, 0);
+    }
+
+    static int integerOrZero(final String input) {
+        return input != null ? Integer.parseInt(input) : 0;
     }
 
     /**
