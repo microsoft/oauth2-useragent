@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class Version
 {
     private final static Pattern JAVA_RUNTIME_VERSION =
-            Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)-(?:.*-)?b(\\d+).*");
+            Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:_(\\d+))?(?:-(?:.*-)?b(\\d+))?.*");
     private final static Pattern GENERIC_VERSION =
             Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*");
     private final int major;
@@ -38,9 +38,9 @@ public class Version
         Matcher matcher = getMatches(JAVA_RUNTIME_VERSION, javaRuntimeVersion);
         int major = Integer.parseInt(matcher.group(1));
         int minor = Integer.parseInt(matcher.group(2));
-        int patch = Integer.parseInt(matcher.group(3));
-        int update = Integer.parseInt(matcher.group(4));
-        int build = Integer.parseInt(matcher.group(5));
+        int patch = integerOrZero(matcher.group(3));
+        int update = integerOrZero(matcher.group(4));
+        int build = integerOrZero(matcher.group(5));
 
         return new Version(major, minor, patch, update, build);
     }
