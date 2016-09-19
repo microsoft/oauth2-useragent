@@ -41,6 +41,22 @@ public class VersionTest
         testJdkParsing(1, 8, 0, 60, 27, "1.8.0_60-b27");
     }
 
+    @Test public void javaWithBuildNoUpdate() {
+        testJdkParsing(1, 8, 0, 0, 132, "1.8.0-b132");
+    }
+
+    @Test public void javaWithUpdateNoBuild() {
+        testJdkParsing(1, 8, 0, 3, 0, "1.8.0_3");
+    }
+
+    @Test public void javaWithNoBuildNoUpdate() {
+        testJdkParsing(1, 8, 0, 0, 0, "1.8.0");
+    }
+
+    @Test public void javaWithNoPatchNoUpdateNoBuild() {
+        testJdkParsing(1, 8, 0, 0, 0, "1.8");
+    }
+
     @Test public void gitVersion()
     {
         testGenericVersion(2, 4, 9, "git version 2.4.9 (Apple Git-60)");
