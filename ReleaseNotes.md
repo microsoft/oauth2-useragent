@@ -1,8 +1,5 @@
-These notes are for release **(to be determined)**.
+These notes are for release **0.11.2**.
 Other releases and their notes can be found at the [oauth2-useragent GitHub Releases](https://github.com/Microsoft/oauth2-useragent/releases) page.
 
-* Major:
-    * TODO
 * Minor:
-    * TODO
-
+    * Relax Java version parsing, fixes issue #37 via pull request #38
