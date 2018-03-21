@@ -69,6 +69,10 @@ public class VersionTest
         testJdkParsing(10, 0, 0, 0, 73, "10-ea+73");
     }
 
+    @Test public void java9UbuntuVersionFormat() {
+        testJdkParsing(9, 1, 0, 0, 0, "9-Ubuntu+0-9b181-4");
+    }
+
     @Test public void gitVersion()
     {
         testGenericVersion(2, 4, 9, "git version 2.4.9 (Apple Git-60)");
