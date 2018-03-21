@@ -12,6 +12,32 @@ public class Version
             Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:_(\\d+))?(?:-(?:.*-)?b(\\d+))?.*");
     private final static Pattern GENERIC_VERSION =
             Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*");
+
+    /**
+     * Java 9 and later: Version can be a single integer or in the format of x.x.x
+     */
+    private final static String VNUM = "(?<VNUM>[1-9][0-9]*(?:(?:\\.0)*\\.[1-9][0-9]*)*)";
+
+    /**
+     * Java 9 and later: Pre-release identifier can be string or integer
+     */
+    private final static String PRE = "(?:-(?<PRE>[a-zA-Z0-9]+))?";
+
+    /**
+     * Java 9 and later: Promoted build number as an integer.
+     */
+    private final static String BUILD = "(?:(?<PLUS>\\+)(?<BUILD>0|[1-9][0-9]*)?)?";
+
+    /**
+     * Java 9 and later: Optional build information as a string or integer.
+     */
+    private final static String OPT = "(?:-(?<OPT>[-a-zA-Z0-9.]+))?";
+
+    /**
+     * Pattern used for Java versions 9 and later.
+     */
+    private final static Pattern JAVA_9_PLUS_VERSION = Pattern.compile(VNUM + PRE + BUILD + OPT);
+
     private final int major;
     private final int minor;
     private final int patch;
@@ -35,14 +61,28 @@ public class Version
      */
     public static Version parseJavaRuntimeVersion(final String javaRuntimeVersion)
     {
-        Matcher matcher = getMatches(JAVA_RUNTIME_VERSION, javaRuntimeVersion);
-        int major = Integer.parseInt(matcher.group(1));
-        int minor = Integer.parseInt(matcher.group(2));
-        int patch = integerOrZero(matcher.group(3));
-        int update = integerOrZero(matcher.group(4));
-        int build = integerOrZero(matcher.group(5));
+        try {
+            Matcher matcher = getMatches(JAVA_9_PLUS_VERSION, javaRuntimeVersion);
+            String[] version = matcher.group(1).split("\\.");
 
-        return new Version(major, minor, patch, update, build);
+            int feature = Integer.parseInt(version[0]);
+            int interim = (version.length > 1 ? Integer.parseInt(version[1]) : 0);
+            int update = (version.length > 2 ? Integer.parseInt(version[2]) : 0);
+            int patch = (version.length > 3 ? Integer.parseInt(version[3]) : 0);
+
+            int build = integerOrZero(matcher.group(4));
+
+            return new Version(feature, interim, update, patch, build);
+        } catch (IllegalArgumentException e) {
+            Matcher matcher = getMatches(JAVA_RUNTIME_VERSION, javaRuntimeVersion);
+            int major = Integer.parseInt(matcher.group(1));
+            int minor = Integer.parseInt(matcher.group(2));
+            int patch = integerOrZero(matcher.group(3));
+            int update = integerOrZero(matcher.group(4));
+            int build = integerOrZero(matcher.group(5));
+
+            return new Version(major, minor, patch, update, build);
+        }
     }
 
     /**

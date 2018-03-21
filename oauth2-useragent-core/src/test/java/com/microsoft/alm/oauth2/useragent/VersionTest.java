@@ -57,6 +57,18 @@ public class VersionTest
         testJdkParsing(1, 8, 0, 0, 0, "1.8");
     }
 
+    @Test public void java9MajorVersionFormat() {
+        testJdkParsing(10, 0, 0, 0, 46, "10+46");
+    }
+
+    @Test public void java9MinorVersionFormat() {
+        testJdkParsing(10, 1, 2, 0, 62, "10.1.2+62");
+    }
+
+    @Test public void java9EarlyAccessVersionFormat() {
+        testJdkParsing(10, 0, 0, 0, 73, "10-ea+73");
+    }
+
     @Test public void gitVersion()
     {
         testGenericVersion(2, 4, 9, "git version 2.4.9 (Apple Git-60)");
@@ -85,5 +97,4 @@ public class VersionTest
         Assert.assertEquals(update, version.getUpdate());
         Assert.assertEquals(build, version.getBuild());
     }
-
 }
