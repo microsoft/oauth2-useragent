@@ -70,7 +70,7 @@ public class VersionTest
     }
 
     @Test public void java9UbuntuVersionFormat() {
-        testJdkParsing(9, 1, 0, 0, 0, "9-Ubuntu+0-9b181-4");
+        testJdkParsing(9, 0, 0, 0, 0, "9-Ubuntu+0-9b181-4");
     }
 
     @Test public void gitVersion()
