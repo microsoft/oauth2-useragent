@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class Version
 {
-    private final static Pattern JAVA_RUNTIME_VERSION =
+    private final static Pattern JAVA_LEGACY_RUNTIME_VERSION =
             Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:_(\\d+))?(?:-(?:.*-)?b(\\d+))?.*");
     private final static Pattern GENERIC_VERSION =
             Pattern.compile("[^0-9]*(\\d+)\\.(\\d+)(?:\\.(\\d+))?.*");
@@ -61,8 +61,9 @@ public class Version
      */
     public static Version parseJavaRuntimeVersion(final String javaRuntimeVersion)
     {
-        try {
-            Matcher matcher = getMatches(JAVA_9_PLUS_VERSION, javaRuntimeVersion);
+        Matcher matcher = JAVA_9_PLUS_VERSION.matcher(javaRuntimeVersion);
+
+        if (matcher.matches()) {
             String[] version = matcher.group(1).split("\\.");
 
             int feature = Integer.parseInt(version[0]);
@@ -73,15 +74,20 @@ public class Version
             int build = integerOrZero(matcher.group(4));
 
             return new Version(feature, interim, update, patch, build);
-        } catch (IllegalArgumentException e) {
-            Matcher matcher = getMatches(JAVA_RUNTIME_VERSION, javaRuntimeVersion);
-            int major = Integer.parseInt(matcher.group(1));
-            int minor = Integer.parseInt(matcher.group(2));
-            int patch = integerOrZero(matcher.group(3));
-            int update = integerOrZero(matcher.group(4));
-            int build = integerOrZero(matcher.group(5));
+        } else {
+            matcher = JAVA_LEGACY_RUNTIME_VERSION.matcher(javaRuntimeVersion);
 
-            return new Version(major, minor, patch, update, build);
+            if (matcher.matches()) {
+                int major = Integer.parseInt(matcher.group(1));
+                int minor = Integer.parseInt(matcher.group(2));
+                int patch = integerOrZero(matcher.group(3));
+                int update = integerOrZero(matcher.group(4));
+                int build = integerOrZero(matcher.group(5));
+
+                return new Version(major, minor, patch, update, build);
+            } else {
+                throw new IllegalArgumentException(getUnrecognizedVersionErrorMessage(javaRuntimeVersion));
+            }
         }
     }
 
@@ -96,12 +102,17 @@ public class Version
      */
     public static Version parseVersion(final String version)
     {
-        Matcher matcher = getMatches(GENERIC_VERSION, version);
-        int major = Integer.parseInt(matcher.group(1));
-        int minor = Integer.parseInt(matcher.group(2));
-        int patch = integerOrZero(matcher.group(3));
+        Matcher matcher = GENERIC_VERSION.matcher(version);
+     
+        if (matcher.matches()) {
+            int major = Integer.parseInt(matcher.group(1));
+            int minor = Integer.parseInt(matcher.group(2));
+            int patch = integerOrZero(matcher.group(3));
 
-        return new Version(major, minor, patch, 0, 0);
+            return new Version(major, minor, patch, 0, 0);
+        } else {
+            throw new IllegalArgumentException(getUnrecognizedVersionErrorMessage(version));
+        }
     }
 
     static int integerOrZero(final String input) {
@@ -109,23 +120,14 @@ public class Version
     }
 
     /**
-     * Given a pattern and a string, a Matcher is returned if any matches are found else an exception is thrown
+     * Returns an error message including the unrecognized version
      *
-     * @param pattern Version pattern to match against
-     * @param version String containing the version
-     * @return Matcher with matches to the version pattern
+     * @param version String containing the unrecognized version
+     * @return Error message for the unrecognized version
      */
-    private static Matcher getMatches(final Pattern pattern, final String version)
-    {
-        final Matcher matcher = pattern.matcher(version);
-        if (!matcher.matches())
-        {
-            final String template = "Unrecognized version string '%1$s'.";
-            final String message = String.format(template, version);
-            throw new IllegalArgumentException(message);
-        }
-
-        return matcher;
+    private static String getUnrecognizedVersionErrorMessage(final String version) {
+        final String template = "Unrecognized version string '%1$s'.";        
+        return String.format(template, version);
     }
 
     public int getMajor() {
